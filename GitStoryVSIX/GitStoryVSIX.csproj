@@ -24,8 +24,8 @@
     <ProjectGuid>{ED1BCA94-869A-41F0-8A7B-D8FCCBF9F147}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GitsVSIX</RootNamespace>
-    <AssemblyName>GitsVSIX</AssemblyName>
+    <RootNamespace>GitStoryVSIX</RootNamespace>
+    <AssemblyName>GitStoryVSIX</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
@@ -55,8 +55,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="GitsVSPackage.cs" />
+    <Compile Include="GitStoryVSPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RunningDocTableEvents.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Key.snk" />
@@ -160,12 +161,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\GitsVSPackage.ico" />
+    <Content Include="Resources\GitStoryVSPackage.ico" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

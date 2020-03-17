@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="GitsVSIX.95eab47a-61d6-4d3e-b786-fa2be3e899b9" Version="0.1" Language="en-US" Publisher="Igor Karatayev" />
-    <DisplayName>GitsVSIX</DisplayName>
-    <Description xml:space="preserve">Gits VSIX Project.</Description>
+    <Identity Id="GitStoryVSIX.95eab47a-61d6-4d3e-b786-fa2be3e899b9" Version="0.1" Language="en-US" Publisher="Igor Karatayev" />
+    <DisplayName>GitStoryVSIX</DisplayName>
+    <Description xml:space="preserve">GitStory VSIX Project.</Description>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0,)" />

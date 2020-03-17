@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Task = System.Threading.Tasks.Task;
 
-namespace GitsVSIX
+namespace GitStoryVSIX
 {
 	/// <summary>
 	/// This is the class that implements the package exposed by this assembly.
@@ -28,19 +28,20 @@ namespace GitsVSIX
 	[PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
 	[ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
-	[Guid(GitsVSPackage.PackageGuidString)]
+	[Guid(GitStoryVSPackage.PackageGuidString)]
 	[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-	public sealed class GitsVSPackage : AsyncPackage
+	public sealed class GitStoryVSPackage : AsyncPackage
 	{
 		/// <summary>
 		/// GitsVSPackage GUID string.
 		/// </summary>
 		public const string PackageGuidString = "1ca85a6f-8929-4d41-adcf-8bbafbbb6740";
+		private RunningDocTableEvents rdte;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="GitsVSPackage"/> class.
+		/// Initializes a new instance of the <see cref="GitStoryVSPackage"/> class.
 		/// </summary>
-		public GitsVSPackage()
+		public GitStoryVSPackage()
 		{
 			// Inside this method you can place any initialization code that does not require
 			// any Visual Studio service because at this point the package object is created but
@@ -62,6 +63,19 @@ namespace GitsVSIX
 			// When initialized asynchronously, the current thread may be a background thread at this point.
 			// Do any initialization that requires the UI thread after switching to the UI thread.
 			await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+			rdte = new RunningDocTableEvents(this);
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			base.Dispose(disposing);
+
+			if (disposing)
+			{
+				rdte.Dispose();
+				rdte = null;
+			}
 		}
 
 		#endregion
