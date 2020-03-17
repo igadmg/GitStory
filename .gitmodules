@@ -1,0 +1,3 @@
+[submodule "SystemEx"]
+	path = SystemEx
+	url = git@github.com:yatagarasu25/SystemEx.git

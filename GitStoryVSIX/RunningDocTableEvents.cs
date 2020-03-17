@@ -1,17 +1,35 @@
-﻿using Microsoft.VisualStudio;
+﻿using GitStory.Core;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
+using System.Linq;
+using System.Reflection;
 
 namespace GitStoryVSIX
 {
-	public class RunningDocTableEvents : IVsRunningDocTableEvents3, IVsRunningDocTableEvents4, IDisposable
+	public static class RunningDocumentInfoEx
 	{
+		static PropertyInfo pIsDirty = typeof(RunningDocumentInfo).GetProperty("IsDirty");
+
+		public static bool IsDirty(this RunningDocumentInfo rdi)
+		{
+			if (pIsDirty == null)
+				return false;
+
+			return (bool)pIsDirty.GetValue(rdi);
+		}
+	}
+
+	public class RunningDocTableEvents : IVsRunningDocTableEvents3, IDisposable
+	{
+		GitStoryVSPackage package;
 		RunningDocumentTable rdt;
 		private uint cookie;
 
-		public RunningDocTableEvents(IServiceProvider serviceProvider)
+		public RunningDocTableEvents(GitStoryVSPackage serviceProvider)
 		{
+			package = serviceProvider;
 			rdt = new RunningDocumentTable(serviceProvider);
 			cookie = rdt.Advise(this);
 		}
@@ -20,18 +38,6 @@ namespace GitStoryVSIX
 		{
 			rdt.Unadvise(cookie);
 		}
-
-		#region IVsRunningDocTableEvents4
-
-		public int OnBeforeFirstDocumentLock(IVsHierarchy pHier, uint itemid, string pszMkDocument) => VSConstants.S_OK;
-		public int OnAfterLastDocumentUnlock(IVsHierarchy pHier, uint itemid, string pszMkDocument, int fClosedWithoutSaving) => VSConstants.S_OK;
-
-		public int OnAfterSaveAll()
-		{
-			return VSConstants.S_OK;
-		}
-
-#endregion IVsRunningDocTableEvents4
 
 #region IVsRunningDocTableEvents3
 
@@ -45,6 +51,13 @@ namespace GitStoryVSIX
 
 		public int OnAfterSave(uint docCookie)
 		{
+			var dirtyCount = rdt.Count(d => d.IsDirty());
+
+			if (dirtyCount == 0)
+			{
+				package.repo?.Store();
+			}
+
 			return VSConstants.S_OK;
 		}
 
