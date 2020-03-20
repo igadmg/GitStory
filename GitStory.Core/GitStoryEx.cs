@@ -8,13 +8,6 @@ namespace GitStory.Core
 {
 	public static class GitStoryEx
 	{
-		public static void Store(this Repository repo)
-		{
-			repo.Store(
-				storyBranchNameFn: (head, commit) => $"{head.FriendlyName}_{commit.Sha}_story",
-				message: "update");
-		}
-
 		static void SwitchToStoryBranch(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
 		{
 			filesNotStaged = new List<string>();
@@ -67,6 +60,11 @@ namespace GitStory.Core
 				repo.SwitchToHeadBranch(headRef, filesNotStaged);
 			}
 		}
+
+		public static void Store(this Repository repo)
+			=> repo.Store(
+				storyBranchNameFn: (head, commit) => $"{head.FriendlyName}_{commit.Sha}_story",
+				message: "update");
 
 		public static void Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
 		{
