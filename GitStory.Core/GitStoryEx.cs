@@ -13,10 +13,10 @@ namespace GitStory.Core
 			var head = repo.Head;
 			var lastHeadCommit = repo.Head.Commits.First();
 
-			var diaryBranchName = $"{head.FriendlyName}_{lastHeadCommit.Sha}_changes";
-			var diaryBranch = repo.Branches.Where(b => b.FriendlyName == diaryBranchName).FirstOrDefault();
+			var storyBranchName = $"{head.FriendlyName}_{lastHeadCommit.Sha}_changes";
+			var diaryBranch = repo.Branches.Where(b => b.FriendlyName == storyBranchName).FirstOrDefault();
 
-			diaryBranch = diaryBranch ?? repo.CreateBranch(diaryBranchName);
+			diaryBranch = diaryBranch ?? repo.CreateBranch(storyBranchName);
 
 			var headRef = repo.Refs.Where(r => r.CanonicalName == head.CanonicalName).FirstOrDefault();
 			var oldHeadRef = headRef;
