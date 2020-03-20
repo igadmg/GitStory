@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "GitStoryCLI": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\workspace\\VsRepos\\GitStory"
+    }
+  }
+}

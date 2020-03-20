@@ -1,6 +1,5 @@
 ﻿using GitStory.Core;
 using LibGit2Sharp;
-using System;
 using System.IO;
 
 namespace GitStoryCLI
