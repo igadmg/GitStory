@@ -14,14 +14,14 @@ namespace GitStory.Core
 			var lastHeadCommit = repo.Head.Commits.First();
 
 			var storyBranchName = $"{head.FriendlyName}_{lastHeadCommit.Sha}_changes";
-			var diaryBranch = repo.Branches.Where(b => b.FriendlyName == storyBranchName).FirstOrDefault();
+			var storyBranch = repo.Branches.Where(b => b.FriendlyName == storyBranchName).FirstOrDefault();
 
-			diaryBranch = diaryBranch ?? repo.CreateBranch(storyBranchName);
+			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
 
 			var headRef = repo.Refs.Where(r => r.CanonicalName == head.CanonicalName).FirstOrDefault();
 			var oldHeadRef = headRef;
 
-			var diaryBranchRef = repo.Refs.Where(r => r.CanonicalName == diaryBranch.CanonicalName).FirstOrDefault();
+			var diaryBranchRef = repo.Refs.Where(r => r.CanonicalName == storyBranch.CanonicalName).FirstOrDefault();
 
 			// got branches
 
