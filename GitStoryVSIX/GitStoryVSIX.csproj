@@ -165,6 +165,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="git2-106a5f2.dll" />
     <Content Include="Resources\GitStoryVSPackage.ico" />
   </ItemGroup>
   <ItemGroup>
