@@ -50,24 +50,41 @@ namespace GitStory.Core
 			Commands.Unstage(repo, filesNotStaged);
 		}
 
+		class ToStoryBranch : IDisposable
+		{
+			Repository repo;
+			Reference headRef;
+			List<string> filesNotStaged;
+
+			public ToStoryBranch(Repository repo, Func<Branch, Commit, string> storyBranchNameFn)
+			{
+				this.repo = repo;
+				repo.SwitchToStoryBranch(storyBranchNameFn, out headRef, out filesNotStaged);
+			}
+
+			public void Dispose()
+			{
+				repo.SwitchToHeadBranch(headRef, filesNotStaged);
+			}
+		}
+
 		public static void Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
 		{
-			repo.SwitchToStoryBranch(storyBranchNameFn, out var headRef, out var filesNotStaged);
-
-			Commands.Stage(repo, "*");
-
-			try
+			using (new ToStoryBranch(repo, storyBranchNameFn))
 			{
-				var author = new Signature(
-					new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
-					, DateTime.Now);
-				repo.Commit(message, author, author);
-			}
-			catch (Exception e)
-			{
-			}
+				Commands.Stage(repo, "*");
 
-			repo.SwitchToHeadBranch(headRef, filesNotStaged);
+				try
+				{
+					var author = new Signature(
+						new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
+						, DateTime.Now);
+					repo.Commit(message, author, author);
+				}
+				catch (Exception e)
+				{
+				}
+			}
 		}
 
 		public static void Fix(this Repository repo)
