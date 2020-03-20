@@ -15,3 +15,8 @@ Parallel to the main branch there is a {branch}_{sha}_change branch with all mic
 I find it interesting tool of getting back to context of any of my numerous projects, some of them abandoned on a midst of the moment of implementation; what happened long time ago need to be particularly thorough.
 
 All this commits hold the information of your last coding actions on any project, task or fix, so you potentially restore the context of your mind process at any given point in the past and find the changes rejected by current task.
+
+![](doc/20-03-2020.23-26-39.png)
+![](doc/20-03-2020.23-29-29.png)
+
+That is how branch is growing before and after commiting a save.
