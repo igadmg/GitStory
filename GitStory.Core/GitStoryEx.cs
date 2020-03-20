@@ -18,7 +18,7 @@ namespace GitStory.Core
 			var head = repo.Head;
 			var lastHeadCommit = repo.Head.Commits.First();
 
-			var storyBranchName = $"{head.FriendlyName}_{lastHeadCommit.Sha}_changes";
+			var storyBranchName = storyBranchNameFn(head, lastHeadCommit);
 			var storyBranch = repo.Branches.Where(b => b.FriendlyName == storyBranchName).FirstOrDefault();
 
 			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
@@ -26,7 +26,7 @@ namespace GitStory.Core
 			var headRef = repo.Refs.Where(r => r.CanonicalName == head.CanonicalName).FirstOrDefault();
 			var oldHeadRef = headRef;
 
-			var diaryBranchRef = repo.Refs.Where(r => r.CanonicalName == storyBranch.CanonicalName).FirstOrDefault();
+			var storyBranchRef = repo.Refs.Where(r => r.CanonicalName == storyBranch.CanonicalName).FirstOrDefault();
 
 			// got branches
 
@@ -39,7 +39,7 @@ namespace GitStory.Core
 					filesNotStaged.Add(item.FilePath);
 				}
 			}
-			repo.Refs.UpdateTarget("HEAD", diaryBranchRef.CanonicalName);
+			repo.Refs.UpdateTarget("HEAD", storyBranchRef.CanonicalName);
 
 			// saved HEAD
 
