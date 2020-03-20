@@ -9,7 +9,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Properties\" />
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SystemEx\SystemEx.csproj" />
   </ItemGroup>
 
 </Project>
