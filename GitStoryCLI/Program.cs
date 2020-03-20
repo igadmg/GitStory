@@ -12,7 +12,18 @@ namespace GitStoryCLI
 
 			using (var repo = new Repository(dir))
 			{
-				Console.WriteLine("Hello World!");
+				if (args.Length == 1 && args[0] == "fix")
+				{
+					Console.WriteLine("Hello World!");
+				}
+				else if (args.Length == 1 && args[0] == "status")
+				{
+
+				}
+				else
+				{
+
+				}
 			}
 		}
 	}

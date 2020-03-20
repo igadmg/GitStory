@@ -9,4 +9,9 @@
     <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GitStory.Core\GitStory.Core.csproj" />
+    <ProjectReference Include="..\SystemEx\SystemEx.csproj" />
+  </ItemGroup>
+
 </Project>
