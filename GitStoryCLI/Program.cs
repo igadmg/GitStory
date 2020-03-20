@@ -1,4 +1,5 @@
-﻿using LibGit2Sharp;
+﻿using GitStory.Core;
+using LibGit2Sharp;
 using System;
 using System.IO;
 
@@ -14,7 +15,7 @@ namespace GitStoryCLI
 			{
 				if (args.Length == 1 && args[0] == "fix")
 				{
-					Console.WriteLine("Hello World!");
+					repo.Fix();
 				}
 				else if (args.Length == 1 && args[0] == "status")
 				{
@@ -22,7 +23,7 @@ namespace GitStoryCLI
 				}
 				else
 				{
-
+					repo.Store();
 				}
 			}
 		}
