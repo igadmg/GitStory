@@ -52,7 +52,7 @@ namespace GitStory.Core
 				var author = new Signature(
 					new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
 					, DateTime.Now);
-				repo.Commit("update", author, author);
+				repo.Commit(message, author, author);
 			}
 			catch (Exception e)
 			{
