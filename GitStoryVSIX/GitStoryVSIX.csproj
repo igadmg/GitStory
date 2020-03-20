@@ -175,13 +175,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GitStory.Core\GitStory.Core.net461.csproj">
-      <Project>{da4a4870-f80b-44dc-b79b-ff75b2f00717}</Project>
-      <Name>GitStory.Core.net461</Name>
+    <ProjectReference Include="..\GitStory.Core\GitStory.Core.csproj">
+      <Project>{b94734fd-2d4c-493d-8a63-c59c9a9eb49b}</Project>
+      <Name>GitStory.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SystemEx\SystemEx.net461.csproj">
-      <Project>{b99c3d19-a0f3-45e0-aecf-3f06688e4493}</Project>
-      <Name>SystemEx.net461</Name>
+    <ProjectReference Include="..\SystemEx\SystemEx.csproj">
+      <Project>{7e2d2e53-1c97-4e0f-914d-cf13d2de6f67}</Project>
+      <Name>SystemEx</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

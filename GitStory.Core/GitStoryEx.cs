@@ -8,24 +8,23 @@ namespace GitStory.Core
 {
 	public static class GitStoryEx
 	{
-		public static void Store(this Repository repo)
+		static void SwitchToStoryBranch(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
 		{
+			filesNotStaged = new List<string>();
+
 			var head = repo.Head;
 			var lastHeadCommit = repo.Head.Commits.First();
 
-			var diaryBranchName = $"{head.FriendlyName}_{lastHeadCommit.Sha}_changes";
-			var diaryBranch = repo.Branches.Where(b => b.FriendlyName == diaryBranchName).FirstOrDefault();
+			var storyBranchName = storyBranchNameFn(head, lastHeadCommit);
+			var storyBranch = repo.Branches.Where(b => b.FriendlyName == storyBranchName).FirstOrDefault();
 
-			diaryBranch = diaryBranch ?? repo.CreateBranch(diaryBranchName);
+			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
 
-			var headRef = repo.Refs.Where(r => r.CanonicalName == head.CanonicalName).FirstOrDefault();
-			var oldHeadRef = headRef;
+			headRef = repo.Refs.Where(r => r.CanonicalName == head.CanonicalName).FirstOrDefault();
 
-			var diaryBranchRef = repo.Refs.Where(r => r.CanonicalName == diaryBranch.CanonicalName).FirstOrDefault();
+			var storyBranchRef = repo.Refs.Where(r => r.CanonicalName == storyBranch.CanonicalName).FirstOrDefault();
 
 			// got branches
-
-			List<string> filesNotStaged = new List<string>();
 
 			foreach (var item in repo.RetrieveStatus(new StatusOptions { ExcludeSubmodules = true, IncludeIgnored = false }))
 			{
@@ -34,28 +33,56 @@ namespace GitStory.Core
 					filesNotStaged.Add(item.FilePath);
 				}
 			}
-			repo.Refs.UpdateTarget("HEAD", diaryBranchRef.CanonicalName);
+			repo.Refs.UpdateTarget("HEAD", storyBranchRef.CanonicalName);
+		}
 
-			// saved HEAD
-
-			Commands.Stage(repo, "*");
-
-			try
-			{
-				var author = new Signature(
-					new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
-					, DateTime.Now);
-				repo.Commit("update", author, author);
-			}
-			catch (Exception e)
-			{
-			}
-
-			// restore HEAD
-
-			repo.Refs.UpdateTarget("HEAD", oldHeadRef.CanonicalName);
+		static void SwitchToHeadBranch(this Repository repo, Reference headRef, List<string> filesNotStaged)
+		{
+			repo.Refs.UpdateTarget("HEAD", headRef.CanonicalName);
 
 			Commands.Unstage(repo, filesNotStaged);
+		}
+
+		class ToStoryBranch : IDisposable
+		{
+			Repository repo;
+			Reference headRef;
+			List<string> filesNotStaged;
+
+			public ToStoryBranch(Repository repo, Func<Branch, Commit, string> storyBranchNameFn)
+			{
+				this.repo = repo;
+				repo.SwitchToStoryBranch(storyBranchNameFn, out headRef, out filesNotStaged);
+			}
+
+			public void Dispose()
+			{
+				repo.SwitchToHeadBranch(headRef, filesNotStaged);
+			}
+		}
+
+		public static void Store(this Repository repo)
+			=> repo.Store(
+				storyBranchNameFn: (head, commit) => $"{head.FriendlyName}_{commit.Sha}_story",
+				message: "update");
+
+		public static void Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
+		{
+			using (new ToStoryBranch(repo, storyBranchNameFn))
+			{
+				Commands.Stage(repo, "*");
+
+				try
+				{
+					var author = new Signature(
+						new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
+						, DateTime.Now);
+					repo.Commit(message, author, author);
+				}
+				catch (Exception e)
+				{
+				}
+			}
 		}
 
 		public static void Fix(this Repository repo)
