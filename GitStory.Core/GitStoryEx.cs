@@ -43,11 +43,16 @@ namespace GitStory.Core
 			repo.Refs.UpdateTarget("HEAD", storyBranchRef.CanonicalName);
 		}
 
+		static void SwitchToHeadBranch(this Repository repo, Reference headRef, List<string> filesNotStaged)
+		{
+			repo.Refs.UpdateTarget("HEAD", headRef.CanonicalName);
+
+			Commands.Unstage(repo, filesNotStaged);
+		}
+
 		public static void Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
 		{
 			repo.SwitchToStoryBranch(storyBranchNameFn, out var headRef, out var filesNotStaged);
-
-			// saved HEAD
 
 			Commands.Stage(repo, "*");
 
@@ -62,11 +67,7 @@ namespace GitStory.Core
 			{
 			}
 
-			// restore HEAD
-
-			repo.Refs.UpdateTarget("HEAD", headRef.CanonicalName);
-
-			Commands.Unstage(repo, filesNotStaged);
+			repo.SwitchToHeadBranch(headRef, filesNotStaged);
 		}
 
 		public static void Fix(this Repository repo)
