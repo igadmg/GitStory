@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LibGit2Sharp;
+using System;
+using System.IO;
 
 namespace GitStoryCLI
 {
@@ -6,7 +8,12 @@ namespace GitStoryCLI
 	{
 		static void Main(string[] args)
 		{
-			Console.WriteLine("Hello World!");
+			string dir = Directory.GetCurrentDirectory();
+
+			using (var repo = new Repository(dir))
+			{
+				Console.WriteLine("Hello World!");
+			}
 		}
 	}
 }
