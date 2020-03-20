@@ -68,6 +68,15 @@ namespace GitStory.Core
 
 		public static void Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
 		{
+			foreach (var sm in repo.Submodules)
+			{
+				try
+				{
+					new Repository(sm.Path).Store(storyBranchNameFn, message);
+				}
+				catch { }
+			}
+
 			using (new ToStoryBranch(repo, storyBranchNameFn))
 			{
 				Commands.Stage(repo, "*");
