@@ -10,6 +10,11 @@ namespace GitStory.Core
 	{
 		public static void Store(this Repository repo)
 		{
+			repo.Store((head, commit) => $"{head.FriendlyName}_{commit.Sha}_story");
+		}
+
+		public static void Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn)
+		{
 			var head = repo.Head;
 			var lastHeadCommit = repo.Head.Commits.First();
 
