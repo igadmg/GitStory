@@ -119,6 +119,19 @@ namespace GitStory.Core
 				catch { }
 			}
 
+			using (new ToStoryBranch(repo, storyBranchNameFn))
+			{
+				Commands.Stage(repo, "*");
+
+				try
+				{
+					
+				}
+				catch (Exception e)
+				{
+				}
+			}
+
 			return repo;
 		}
 
