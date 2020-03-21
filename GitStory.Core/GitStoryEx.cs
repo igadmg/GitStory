@@ -8,6 +8,9 @@ namespace GitStory.Core
 {
 	public static class GitStoryEx
 	{
+		public static Func<Branch, Commit, string> DefaultStoryBranchNameFn = (head, commit) => $"{head.FriendlyName}_{commit.Sha}_story";
+		public static string DefaultCommitMessage = "update";
+
 		static void SwitchToStoryBranch(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
 		{
 			filesNotStaged = new List<string>();
@@ -61,15 +64,18 @@ namespace GitStory.Core
 			}
 		}
 
-		public static void Store(this Repository repo)
+		public static Repository Store(this Repository repo)
 			=> repo.Store(
-				storyBranchNameFn: (head, commit) => $"{head.FriendlyName}_{commit.Sha}_story",
-				message: "update");
+				storyBranchNameFn: DefaultStoryBranchNameFn,
+				message: DefaultCommitMessage);
 
-		public static void Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
+		public static Repository Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
 		{
 			foreach (var sm in repo.Submodules)
 			{
+				if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
+					continue;
+
 				try
 				{
 					new Repository(sm.Path).Store(storyBranchNameFn, message);
@@ -88,10 +94,44 @@ namespace GitStory.Core
 						, DateTime.Now);
 					repo.Commit(message, author, author);
 				}
-				catch (Exception e)
-				{
-				}
+				catch { }
 			}
+
+			return repo;
+		}
+
+		public static Repository Status(this Repository repo)
+			=> repo.Status(storyBranchNameFn: DefaultStoryBranchNameFn);
+
+		public static Repository Status(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn)
+		{
+			foreach (var sm in repo.Submodules)
+			{
+				if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
+					continue;
+
+				try
+				{
+					new Repository(sm.Path).Status(storyBranchNameFn);
+				}
+				catch { }
+			}
+
+			using (new ToStoryBranch(repo, storyBranchNameFn))
+			{
+				Commands.Stage(repo, "*");
+
+				try
+				{
+					foreach (var item in repo.RetrieveStatus(new StatusOptions { ExcludeSubmodules = true, IncludeIgnored = false }))
+					{
+						Console.WriteLine($"{item.State}: {item.FilePath}");
+					}
+				}
+				catch { }
+			}
+
+			return repo;
 		}
 
 		public static void Fix(this Repository repo)

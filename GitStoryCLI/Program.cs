@@ -8,7 +8,7 @@ namespace GitStoryCLI
 	{
 		static void Main(string[] args)
 		{
-			string dir = Directory.GetCurrentDirectory();
+			string dir = Repository.Discover(Directory.GetCurrentDirectory());
 
 			using (var repo = new Repository(dir))
 			{
@@ -18,7 +18,7 @@ namespace GitStoryCLI
 				}
 				else if (args.Length == 1 && args[0] == "status")
 				{
-
+					repo.Status();
 				}
 				else
 				{
