@@ -51,7 +51,24 @@ namespace GitStory.Core
 
 		static void RestoreStatus(this Repository repo, Dictionary<string, FileStatus> filesStatus)
 		{
-			Commands.Unstage(repo, filesStatus.Where(p => !p.Value.HasFlag(FileStatus.ModifiedInWorkdir)).Select(p => p.Key));
+			Commands.Unstage(repo, filesStatus.Where(p => !p.Value.HasFlag(FileStatus.ModifiedInIndex)).Select(p => p.Key));
+		}
+
+		class CaptureStatus : IDisposable
+		{
+			Repository repo;
+			Dictionary<string, FileStatus> filesStatus;
+
+			public CaptureStatus(Repository repo)
+			{
+				this.repo = repo;
+				repo.SaveStatus(out filesNotStaged);
+			}
+
+			public void Dispose()
+			{
+				repo.SwitchToHeadBranch(headRef, filesNotStaged);
+			}
 		}
 
 		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef)
