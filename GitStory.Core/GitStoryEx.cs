@@ -61,12 +61,12 @@ namespace GitStory.Core
 			}
 		}
 
-		public static void Store(this Repository repo)
+		public static Repository Store(this Repository repo)
 			=> repo.Store(
 				storyBranchNameFn: (head, commit) => $"{head.FriendlyName}_{commit.Sha}_story",
 				message: "update");
 
-		public static void Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
+		public static Repository Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
 		{
 			foreach (var sm in repo.Submodules)
 			{
@@ -92,6 +92,13 @@ namespace GitStory.Core
 				{
 				}
 			}
+
+			return repo;
+		}
+
+		public static Repository Status(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn)
+		{
+			return repo;
 		}
 
 		public static void Fix(this Repository repo)
