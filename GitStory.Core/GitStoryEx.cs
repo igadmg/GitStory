@@ -51,10 +51,7 @@ namespace GitStory.Core
 
 		static void RestoreStatus(this Repository repo, Dictionary<string, FileStatus> filesStatus)
 		{
-			foreach (var i in filesStatus)
-			{
-				Commands.Unstage(repo, filesNotStaged);
-			}
+			Commands.Unstage(repo, filesStatus.Where(p => !p.Value.HasFlag(FileStatus.ModifiedInWorkdir)).Select(p => p.Key));
 		}
 
 		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef)
