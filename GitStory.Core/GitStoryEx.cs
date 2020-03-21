@@ -19,17 +19,17 @@ namespace GitStory.Core
 			if (uuid == null)
 			{
 				uuid = Guid.NewGuid().ToString("N");
-				repo.Config.Set("gitstory.uuid", uuid);
+				repo.SetRepositoryUuid(uuid);
 			}
 
 			return uuid;
 		}
 
-		public static string SetRepositoryUuid(this Repository repo, string uuid)
+		public static Repository SetRepositoryUuid(this Repository repo, string uuid)
 		{
 			repo.Config.Set("gitstory.uuid", uuid);
 
-			return uuid;
+			return repo;
 		}
 
 		public static Signature GetAuthorSignature(this Repository repo, DateTime time)
