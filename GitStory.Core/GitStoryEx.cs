@@ -19,7 +19,7 @@ namespace GitStory.Core
 			if (uuid == null)
 			{
 				uuid = Guid.NewGuid().ToString("N");
-				repo.Config.Set<string>("gitstory.uuid", uuid);
+				repo.Config.Set("gitstory.uuid", uuid);
 			}
 
 			return uuid;
