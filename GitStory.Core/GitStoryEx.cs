@@ -13,7 +13,7 @@ namespace GitStory.Core
 		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}_{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
-		public static string GetRepositoryUuid(this Repository repo)
+		public static string GetUuid(this Repository repo)
 		{
 			var uuid = repo.Config.Get<string>("gitstory.uuid")?.Value;
 			if (uuid == null)
@@ -88,7 +88,7 @@ namespace GitStory.Core
 
 		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef)
 		{
-			var id = repo.GetRepositoryUuid();
+			var id = repo.GetUuid();
 			var head = repo.Head;
 			var lastHeadCommit = repo.Head.Commits.First();
 
