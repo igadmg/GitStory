@@ -114,7 +114,7 @@ namespace GitStory.Core
 		public static Repository Status(this Repository repo)
 			=> repo.Status(storyBranchNameFn: DefaultStoryBranchNameFn);
 
-		public static Repository Status(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn)
+		public static Repository Status(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 		{
 			foreach (var sm in repo.Submodules)
 			{
