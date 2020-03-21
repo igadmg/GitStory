@@ -12,6 +12,8 @@ namespace GitStoryCLI
 
 			using (var repo = new Repository(dir))
 			{
+				repo.Config.Set("gitstory.commiter.name", "Git Story");
+
 				if (args.Length == 1 && args[0] == "fix")
 				{
 					repo.Fix();
