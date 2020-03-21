@@ -8,6 +8,9 @@ namespace GitStory.Core
 {
 	public static class GitStoryEx
 	{
+		public static Func<Branch, Commit, string> DefaultStoryBranchNameFn = (head, commit) => $"{head.FriendlyName}_{commit.Sha}_story";
+		public static string DefaultCommitMessage = "update";
+
 		static void SwitchToStoryBranch(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
 		{
 			filesNotStaged = new List<string>();
@@ -63,7 +66,7 @@ namespace GitStory.Core
 
 		public static Repository Store(this Repository repo)
 			=> repo.Store(
-				storyBranchNameFn: (head, commit) => $"{head.FriendlyName}_{commit.Sha}_story",
+				storyBranchNameFn: DefaultStoryBranchNameFn,
 				message: "update");
 
 		public static Repository Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
@@ -93,6 +96,11 @@ namespace GitStory.Core
 				}
 			}
 
+			return repo;
+		}
+
+		public static Repository Status(this Repository repo)
+		{
 			return repo;
 		}
 
