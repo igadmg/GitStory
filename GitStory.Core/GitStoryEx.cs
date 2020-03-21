@@ -23,6 +23,11 @@ namespace GitStory.Core
 				new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
 				, time);
 
+		public static Signature GetCommiterSignature(this Repository repo, DateTime time)
+			=> new Signature(
+				new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
+				, time);
+
 		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
 		{
 			filesNotStaged = new List<string>();
