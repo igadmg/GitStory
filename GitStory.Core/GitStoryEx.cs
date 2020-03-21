@@ -18,14 +18,15 @@ namespace GitStory.Core
 			return Guid.NewGuid();
 		}
 
-		static void SwitchToStoryBranch(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
+		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
 		{
 			filesNotStaged = new List<string>();
 
+			var id = repo.GetRepositoryGuid();
 			var head = repo.Head;
 			var lastHeadCommit = repo.Head.Commits.First();
 
-			var storyBranchName = storyBranchNameFn(head, lastHeadCommit);
+			var storyBranchName = storyBranchNameFn(id.ToString("N"), head, lastHeadCommit);
 			var storyBranch = repo.Branches.Where(b => b.FriendlyName == storyBranchName).FirstOrDefault();
 
 			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
@@ -59,7 +60,7 @@ namespace GitStory.Core
 			Reference headRef;
 			List<string> filesNotStaged;
 
-			public ToStoryBranch(Repository repo, Func<string, Branch, Commit, string> storyBranchNameFn)
+			public ToStoryBranch(Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 			{
 				this.repo = repo;
 				repo.SwitchToStoryBranch(storyBranchNameFn, out headRef, out filesNotStaged);
@@ -76,7 +77,7 @@ namespace GitStory.Core
 				storyBranchNameFn: DefaultStoryBranchNameFn,
 				message: DefaultCommitMessage);
 
-		public static Repository Store(this Repository repo, Func<string, Branch, Commit, string> storyBranchNameFn, string message)
+		public static Repository Store(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, string message)
 		{
 			foreach (var sm in repo.Submodules)
 			{
