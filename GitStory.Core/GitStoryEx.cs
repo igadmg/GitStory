@@ -94,9 +94,7 @@ namespace GitStory.Core
 						, DateTime.Now);
 					repo.Commit(message, author, author);
 				}
-				catch (Exception e)
-				{
-				}
+				catch { }
 			}
 
 			return repo;
@@ -125,11 +123,12 @@ namespace GitStory.Core
 
 				try
 				{
-					
+					foreach (var item in repo.RetrieveStatus(new StatusOptions { ExcludeSubmodules = true, IncludeIgnored = false }))
+					{
+						Console.WriteLine($"{item.State}: {item.FilePath}");
+					}
 				}
-				catch (Exception e)
-				{
-				}
+				catch { }
 			}
 
 			return repo;
