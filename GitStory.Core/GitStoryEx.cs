@@ -43,7 +43,7 @@ namespace GitStory.Core
 		{
 			filesNotStaged = new List<string>();
 
-			var id = repo.GetRepositoryGuid().ToString("N");
+			var id = repo.GetRepositoryUuid();
 			var head = repo.Head;
 			var lastHeadCommit = repo.Head.Commits.First();
 
