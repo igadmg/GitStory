@@ -62,12 +62,12 @@ namespace GitStory.Core
 			public CaptureStatus(Repository repo)
 			{
 				this.repo = repo;
-				repo.SaveStatus(out filesNotStaged);
+				repo.SaveStatus(out filesStatus);
 			}
 
 			public void Dispose()
 			{
-				repo.SwitchToHeadBranch(headRef, filesNotStaged);
+				repo.RestoreStatus(filesStatus);
 			}
 		}
 
