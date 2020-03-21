@@ -39,10 +39,18 @@ namespace GitStory.Core
 					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value))
 				, time);
 
-		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
+		static void SaveStatus(this Repository repo, out Dictionary<string, FileStatus> filesStatus)
 		{
-			filesNotStaged = new List<string>();
+			filesStatus = new Dictionary<string, FileStatus>();
 
+			foreach (var item in repo.RetrieveStatus(new StatusOptions { IncludeIgnored = false }))
+			{
+				filesStatus.Add(item.FilePath, item.State);
+			}
+		}
+
+		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef)
+		{
 			var id = repo.GetRepositoryUuid();
 			var head = repo.Head;
 			var lastHeadCommit = repo.Head.Commits.First();
@@ -58,13 +66,6 @@ namespace GitStory.Core
 
 			// got branches
 
-			foreach (var item in repo.RetrieveStatus(new StatusOptions { ExcludeSubmodules = true, IncludeIgnored = false }))
-			{
-				if (!item.State.HasFlag(FileStatus.ModifiedInIndex))
-				{
-					filesNotStaged.Add(item.FilePath);
-				}
-			}
 			repo.Refs.UpdateTarget("HEAD", storyBranchRef.CanonicalName);
 		}
 
