@@ -8,12 +8,14 @@ namespace GitStory.Core
 {
 	public static class GitStoryEx
 	{
+		public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
+
 		public static Func<string/*id*/, Branch, Commit, string> DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}_{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
 		public static Guid GetRepositoryGuid(this Repository repo)
 		{
-
+			repo.Co
 		}
 
 		static void SwitchToStoryBranch(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
@@ -57,7 +59,7 @@ namespace GitStory.Core
 			Reference headRef;
 			List<string> filesNotStaged;
 
-			public ToStoryBranch(Repository repo, Func<Branch, Commit, string> storyBranchNameFn)
+			public ToStoryBranch(Repository repo, Func<string, Branch, Commit, string> storyBranchNameFn)
 			{
 				this.repo = repo;
 				repo.SwitchToStoryBranch(storyBranchNameFn, out headRef, out filesNotStaged);
@@ -74,7 +76,7 @@ namespace GitStory.Core
 				storyBranchNameFn: DefaultStoryBranchNameFn,
 				message: DefaultCommitMessage);
 
-		public static Repository Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
+		public static Repository Store(this Repository repo, Func<string, Branch, Commit, string> storyBranchNameFn, string message)
 		{
 			foreach (var sm in repo.Submodules)
 			{
@@ -95,6 +97,9 @@ namespace GitStory.Core
 				try
 				{
 					var author = new Signature(
+						new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
+						, DateTime.Now);
+					var commiter = new Signature(
 						new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
 						, DateTime.Now);
 					repo.Commit(message, author, author);
