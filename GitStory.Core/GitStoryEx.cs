@@ -22,11 +22,11 @@ namespace GitStory.Core
 		{
 			filesNotStaged = new List<string>();
 
-			var id = repo.GetRepositoryGuid();
+			var id = repo.GetRepositoryGuid().ToString("N");
 			var head = repo.Head;
 			var lastHeadCommit = repo.Head.Commits.First();
 
-			var storyBranchName = storyBranchNameFn(id.ToString("N"), head, lastHeadCommit);
+			var storyBranchName = storyBranchNameFn(id, head, lastHeadCommit);
 			var storyBranch = repo.Branches.Where(b => b.FriendlyName == storyBranchName).FirstOrDefault();
 
 			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
