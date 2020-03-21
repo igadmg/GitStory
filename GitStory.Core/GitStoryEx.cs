@@ -11,6 +11,11 @@ namespace GitStory.Core
 		public static Func<string/*id*/, Branch, Commit, string> DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}_{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
+		public static Guid GetRepositoryGuid(this Repository repo)
+		{
+
+		}
+
 		static void SwitchToStoryBranch(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
 		{
 			filesNotStaged = new List<string>();
