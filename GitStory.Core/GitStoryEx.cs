@@ -25,6 +25,13 @@ namespace GitStory.Core
 			return uuid;
 		}
 
+		public static string SetRepositoryUuid(this Repository repo, string uuid)
+		{
+			repo.Config.Set("gitstory.uuid", uuid);
+
+			return uuid;
+		}
+
 		public static Signature GetAuthorSignature(this Repository repo, DateTime time)
 			=> new Signature(
 				new Identity(
