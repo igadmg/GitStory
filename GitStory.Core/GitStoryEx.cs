@@ -73,6 +73,9 @@ namespace GitStory.Core
 		{
 			foreach (var sm in repo.Submodules)
 			{
+				if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
+					continue;
+
 				try
 				{
 					new Repository(sm.Path).Store(storyBranchNameFn, message);
