@@ -10,12 +10,12 @@ namespace GitStory.Core
 	{
 		public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
 
-		public static Func<string/*id*/, Branch, Commit, string> DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}_{commit.Sha}";
+		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}_{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
 		public static Guid GetRepositoryGuid(this Repository repo)
 		{
-			repo.Co
+			return Guid.NewGuid();
 		}
 
 		static void SwitchToStoryBranch(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
