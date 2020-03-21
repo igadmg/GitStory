@@ -18,6 +18,9 @@ namespace GitStory.Core
 			return Guid.NewGuid();
 		}
 
+		public static Signature GetAuthor(this Repository repo)
+			=> 
+
 		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
 		{
 			filesNotStaged = new List<string>();
@@ -97,13 +100,11 @@ namespace GitStory.Core
 
 				try
 				{
-					var author = new Signature(
-						new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
-						, DateTime.Now);
+					var author = repo.GetAuthor();
 					var commiter = new Signature(
 						new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
 						, DateTime.Now);
-					repo.Commit(message, author, author);
+					repo.Commit(message, author, commiter);
 				}
 				catch { }
 			}
