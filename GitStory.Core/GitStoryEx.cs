@@ -67,7 +67,7 @@ namespace GitStory.Core
 		public static Repository Store(this Repository repo)
 			=> repo.Store(
 				storyBranchNameFn: DefaultStoryBranchNameFn,
-				message: "update");
+				message: DefaultCommitMessage);
 
 		public static Repository Store(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn, string message)
 		{
@@ -100,9 +100,7 @@ namespace GitStory.Core
 		}
 
 		public static Repository Status(this Repository repo)
-		{
-			return repo;
-		}
+			=> repo.Status(storyBranchNameFn: DefaultStoryBranchNameFn);
 
 		public static Repository Status(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn)
 		{
