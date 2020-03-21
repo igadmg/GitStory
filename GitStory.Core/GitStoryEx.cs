@@ -107,6 +107,18 @@ namespace GitStory.Core
 
 		public static Repository Status(this Repository repo, Func<Branch, Commit, string> storyBranchNameFn)
 		{
+			foreach (var sm in repo.Submodules)
+			{
+				if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
+					continue;
+
+				try
+				{
+					new Repository(sm.Path).Status(storyBranchNameFn);
+				}
+				catch { }
+			}
+
 			return repo;
 		}
 
