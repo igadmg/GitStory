@@ -20,7 +20,9 @@ namespace GitStory.Core
 
 		public static Signature GetAuthorSignature(this Repository repo, DateTime time)
 			=> new Signature(
-				new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
+				new Identity(
+					repo.Config.Get<string>("user.name").Value,
+					repo.Config.Get<string>("user.email").Value)
 				, time);
 
 		public static Signature GetCommiterSignature(this Repository repo, DateTime time)
