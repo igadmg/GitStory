@@ -21,7 +21,7 @@ namespace GitStory.Core
 		public static Signature GetAuthorSignature(this Repository repo, DateTime time)
 			=> new Signature(
 				new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
-				, time)
+				, time);
 
 		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
 		{
