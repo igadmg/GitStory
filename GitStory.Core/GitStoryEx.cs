@@ -49,6 +49,14 @@ namespace GitStory.Core
 			}
 		}
 
+		static void RestoreStatus(this Repository repo, Dictionary<string, FileStatus> filesStatus)
+		{
+			foreach (var i in filesStatus)
+			{
+				Commands.Unstage(repo, filesNotStaged);
+			}
+		}
+
 		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef)
 		{
 			var id = repo.GetRepositoryUuid();
@@ -72,8 +80,6 @@ namespace GitStory.Core
 		static void SwitchToHeadBranch(this Repository repo, Reference headRef, List<string> filesNotStaged)
 		{
 			repo.Refs.UpdateTarget("HEAD", headRef.CanonicalName);
-
-			Commands.Unstage(repo, filesNotStaged);
 		}
 
 		class ToStoryBranch : IDisposable
