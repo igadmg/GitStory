@@ -93,7 +93,7 @@ namespace GitStory.Core
 			repo.Refs.UpdateTarget("HEAD", storyBranchRef.CanonicalName);
 		}
 
-		static void SwitchToHeadBranch(this Repository repo, Reference headRef, List<string> filesNotStaged)
+		static void SwitchToHeadBranch(this Repository repo, Reference headRef)
 		{
 			repo.Refs.UpdateTarget("HEAD", headRef.CanonicalName);
 		}
@@ -102,17 +102,16 @@ namespace GitStory.Core
 		{
 			Repository repo;
 			Reference headRef;
-			List<string> filesNotStaged;
 
 			public ToStoryBranch(Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 			{
 				this.repo = repo;
-				repo.SwitchToStoryBranch(storyBranchNameFn, out headRef, out filesNotStaged);
+				repo.SwitchToStoryBranch(storyBranchNameFn, out headRef);
 			}
 
 			public void Dispose()
 			{
-				repo.SwitchToHeadBranch(headRef, filesNotStaged);
+				repo.SwitchToHeadBranch(headRef);
 			}
 		}
 
