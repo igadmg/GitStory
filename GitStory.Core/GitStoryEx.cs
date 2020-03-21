@@ -59,6 +59,8 @@ namespace GitStory.Core
 			Repository repo;
 			Dictionary<string, FileStatus> filesStatus;
 
+			public bool IsEmpty => filesStatus.Count == 0;
+
 			public CaptureStatus(Repository repo)
 			{
 				this.repo = repo;
