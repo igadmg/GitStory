@@ -20,3 +20,25 @@ All this commits hold the information of your last coding actions on any project
 ![](doc/20-03-2020.23-29-29.png)
 
 That is how branch is growing before and after commiting a save.
+
+## Visual Studio extension
+
+By installing Visual Studio extension you automatically enable it in any project using git. It will make save commits whenever last or all open documents are saved.
+
+## CLI Tool
+
+CLI tool GitStory can do the same an IDE extension is doing. Just simply run it in any folder of your project and it will do the trick.
+
+You can also make a simple script like this:
+
+```
+#!/bin/sh
+GitStory.exe $@
+```
+
+Name it `git-story` and put to path directory. That will add a `git story` command to git.
+
+
+## PS
+
+Usually you don't need to push your story branches to the upstream, but you can. And that repository have story branches uploaded to show the idea how GitStory works.
