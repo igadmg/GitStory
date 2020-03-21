@@ -122,30 +122,36 @@ namespace GitStory.Core
 
 		public static Repository Store(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, string message)
 		{
-			foreach (var sm in repo.Submodules)
+			using (var st = new CaptureStatus(repo))
 			{
-				if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
-					continue;
+				if (st.IsEmpty)
+					return repo;
 
-				try
+				foreach (var sm in repo.Submodules)
 				{
-					new Repository(sm.Path).Store(storyBranchNameFn, message);
+					if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
+						continue;
+
+					try
+					{
+						new Repository(sm.Path).Store(storyBranchNameFn, message);
+					}
+					catch { }
 				}
-				catch { }
-			}
 
-			using (new ToStoryBranch(repo, storyBranchNameFn))
-			{
-				Commands.Stage(repo, "*");
-
-				try
+				using (new ToStoryBranch(repo, storyBranchNameFn))
 				{
-					var now = DateTime.Now;
-					var author = repo.GetAuthorSignature(now);
-					var commiter = repo.GetCommiterSignature(now);
-					repo.Commit(message, author, commiter);
+					Commands.Stage(repo, "*");
+
+					try
+					{
+						var now = DateTime.Now;
+						var author = repo.GetAuthorSignature(now);
+						var commiter = repo.GetCommiterSignature(now);
+						repo.Commit(message, author, commiter);
+					}
+					catch { }
 				}
-				catch { }
 			}
 
 			return repo;
@@ -156,30 +162,33 @@ namespace GitStory.Core
 
 		public static Repository Status(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 		{
-			foreach (var sm in repo.Submodules)
+			using (var st = new CaptureStatus(repo))
 			{
-				if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
-					continue;
-
-				try
+				foreach (var sm in repo.Submodules)
 				{
-					new Repository(sm.Path).Status(storyBranchNameFn);
-				}
-				catch { }
-			}
+					if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
+						continue;
 
-			using (new ToStoryBranch(repo, storyBranchNameFn))
-			{
-				Commands.Stage(repo, "*");
-
-				try
-				{
-					foreach (var item in repo.RetrieveStatus(new StatusOptions { ExcludeSubmodules = true, IncludeIgnored = false }))
+					try
 					{
-						Console.WriteLine($"{item.State}: {item.FilePath}");
+						new Repository(sm.Path).Status(storyBranchNameFn);
 					}
+					catch { }
 				}
-				catch { }
+
+				using (new ToStoryBranch(repo, storyBranchNameFn))
+				{
+					Commands.Stage(repo, "*");
+
+					try
+					{
+						foreach (var item in repo.RetrieveStatus(new StatusOptions { ExcludeSubmodules = true, IncludeIgnored = false }))
+						{
+							Console.WriteLine($"{item.State}: {item.FilePath}");
+						}
+					}
+					catch { }
+				}
 			}
 
 			return repo;
