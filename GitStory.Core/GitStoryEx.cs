@@ -19,13 +19,13 @@ namespace GitStory.Core
 			if (uuid == null)
 			{
 				uuid = Guid.NewGuid().ToString("N");
-				repo.SetRepositoryUuid(uuid);
+				repo.SetUuid(uuid);
 			}
 
 			return uuid;
 		}
 
-		public static Repository SetRepositoryUuid(this Repository repo, string uuid)
+		public static Repository SetUuid(this Repository repo, string uuid)
 		{
 			repo.Config.Set("gitstory.uuid", uuid);
 
