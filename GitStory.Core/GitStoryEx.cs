@@ -51,7 +51,9 @@ namespace GitStory.Core
 
 		static void RestoreStatus(this Repository repo, Dictionary<string, FileStatus> filesStatus)
 		{
-			var filesToUnstage = filesStatus.Where(p => !p.Value.HasFlag(FileStatus.ModifiedInIndex)).Select(p => p.Key);
+			var filesToUnstage = filesStatus
+				.Where(p => !p.Value.HasFlag(FileStatus.ModifiedInIndex))
+				.Select(p => p.Key);
 			if (filesToUnstage.Any())
 			{
 				Commands.Unstage(repo, filesToUnstage);
