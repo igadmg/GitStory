@@ -8,8 +8,7 @@ namespace GitStoryCLI
 	{
 		static void Main(string[] args)
 		{
-			string dir = Directory.GetCurrentDirectory();
-			dir = Repository.Discover(dir);
+			string dir = Repository.Discover(Directory.GetCurrentDirectory());
 
 			using (var repo = new Repository(dir))
 			{
