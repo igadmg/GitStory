@@ -111,10 +111,9 @@ namespace GitStory.Core
 
 				try
 				{
-					var author = repo.GetAuthor();
-					var commiter = new Signature(
-						new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
-						, DateTime.Now);
+					var now = DateTime.Now;
+					var author = repo.GetAuthorSignature(now);
+					var commiter = repo.GetCommiterSignature(now);
 					repo.Commit(message, author, commiter);
 				}
 				catch { }
