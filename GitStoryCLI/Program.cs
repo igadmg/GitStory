@@ -20,6 +20,10 @@ namespace GitStoryCLI
 				{
 					repo.Status();
 				}
+				else if (args.Length == 2 && args[0] == "set-uuid")
+				{
+					repo.SetUuid(args[1]);
+				}
 				else
 				{
 					repo.Store();
