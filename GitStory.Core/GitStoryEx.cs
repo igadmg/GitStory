@@ -164,6 +164,9 @@ namespace GitStory.Core
 		{
 			using (var st = new CaptureStatus(repo))
 			{
+				if (st.IsEmpty)
+					return repo;
+
 				foreach (var sm in repo.Submodules)
 				{
 					if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
