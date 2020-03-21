@@ -15,7 +15,7 @@ namespace GitStory.Core
 
 		public static string GetRepositoryUuid(this Repository repo)
 		{
-			var uuid = repo.Config.Get<string>("gitstory.uuid").Value;
+			var uuid = repo.Config.Get<string>("gitstory.uuid")?.Value;
 			if (uuid == null)
 			{
 				uuid = Guid.NewGuid().ToString("N");
