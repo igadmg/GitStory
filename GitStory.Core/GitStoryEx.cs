@@ -18,8 +18,10 @@ namespace GitStory.Core
 			return Guid.NewGuid();
 		}
 
-		public static Signature GetAuthor(this Repository repo)
-			=> 
+		public static Signature GetAuthorSignature(this Repository repo, DateTime time)
+			=> new Signature(
+				new Identity(repo.Config.Get<string>("user.name").Value, repo.Config.Get<string>("user.email").Value)
+				, time.Now)
 
 		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef, out List<string> filesNotStaged)
 		{
