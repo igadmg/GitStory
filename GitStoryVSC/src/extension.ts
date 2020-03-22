@@ -3,6 +3,13 @@
 import * as vscode from 'vscode';
 import { OpenDocumentTracker } from './OpenDocumentTracker';
 
+function launchGitStory(context: vscode.ExtensionContext) {
+	const cp = require('child_process');
+	cp.exec(context.asAbsolutePath('bin/GitStoryCLI.exe'), {
+		cwd: vscode.workspace.rootPath
+	});
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -11,7 +18,14 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(tracker);
 
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument((td) => {
-		console.log(`did save ${td.uri}:${tracker.documents.length}`);
+		var allClean = true;
+		tracker.documents.forEach(td => {
+			allClean = allClean && !td.isDirty;
+		});
+
+		if (allClean) {
+			launchGitStory(context);
+		}
 	}));
 }
 
