@@ -5,8 +5,12 @@ import { OpenDocumentTracker } from './OpenDocumentTracker';
 
 function launchGitStory(context: vscode.ExtensionContext) {
 	const cp = require('child_process');
-	cp.exec(context.asAbsolutePath('bin/GitStoryCLI.exe'), {
-		cwd: vscode.workspace.rootPath
+
+	vscode.workspace.workspaceFolders?.forEach(wf => {
+		cp.exec(context.asAbsolutePath('bin/GitStoryCLI.exe'), {
+			cwd: wf.uri.fsPath
+		});
+	
 	});
 }
 
