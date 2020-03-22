@@ -25,6 +25,12 @@ That is how branch is growing before and after commiting a save.
 
 By installing Visual Studio extension you automatically enable it in any project using git. It will make save commits whenever last or all open documents are saved.
 
+## Visual Studio Code extension
+
+Works the same way as Visual Studio extension. The only prerequisite is - you need to open a working folder in VS Code for it to find a git repository.
+
+I am not a daily user of VS Code, so comments are welcome.
+
 ## CLI Tool
 
 CLI tool GitStory can do the same an IDE extension is doing. Just simply run it in any folder of your project and it will do the trick.
