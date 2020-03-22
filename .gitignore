@@ -358,3 +358,4 @@ MigrationBackup/
 
 node_modules
 out
+*.vsix
