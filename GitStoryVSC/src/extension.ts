@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(tracker);
 
 	context.subscriptions.push(vscode.workspace.onDidSaveTextDocument((td) => {
-		console.log(`did save ${td.uri}:${vscode.workspace.textDocuments.values.length}`);
+		console.log(`did save ${td.uri}:${tracker.documents.length}`);
 	}));
 }
 
