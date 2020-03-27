@@ -21,6 +21,16 @@ All this commits hold the information of your last coding actions on any project
 
 That is how branch is growing before and after commiting a save.
 
+## So what it gives you
+
+You have the information not only about what code is required to achieve some task, but also a history of that code change. How you finally found the solution. So in the en you possibly have:
+
+* Unlimited Undo across all the editors.
+* Code change heatmap - the lines which undergo through most changes, either you where running in loops or trying to use different solutions to solve the problem.
+* Finally you will have the information how your code evolved, what you where doing last hours, days or weeks in order to solve current problem.
+
+You can share all that information to other people, read their stories, learn from them, teach them, share your experience.
+
 ## Visual Studio extension
 
 By installing Visual Studio extension you automatically enable it in any project using git. It will make save commits whenever last or all open documents are saved.
