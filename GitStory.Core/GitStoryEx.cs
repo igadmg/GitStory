@@ -16,8 +16,7 @@ namespace GitStory.Core
 		public static string GenerateUuid(this Repository repo)
 		{
 			var author = repo.GetAuthorSignature(DateTime.Now);
-			//author.
-			return null;
+			return author.ToString().HashSHA1();
 		}
 
 		public static string GetUuid(this Repository repo)
