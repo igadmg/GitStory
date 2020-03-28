@@ -66,7 +66,7 @@ namespace GitStory.Core
 					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value))
 				, time);
 
-		public static Branch GetStoryBranch(this Repository repo, Branch branch, StoryBranchNameDelegate storyBranchNameFn, out string )
+		public static Branch GetStoryBranch(this Repository repo, Branch branch, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
 		{
 			var id = repo.GetUuid();
 			var currentCommit = branch.Commits.First();
