@@ -123,11 +123,7 @@ namespace GitStory.Core
 			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
 
 			headRef = repo.Head.Reference;
-			var storyBranchRef = repo.Refs.Where(r => r.CanonicalName == storyBranch.CanonicalName).FirstOrDefault();
-
-			// got branches
-
-			repo.Refs.UpdateTarget("HEAD", storyBranchRef.CanonicalName);
+			repo.Refs.UpdateTarget("HEAD", storyBranch.CanonicalName);
 		}
 
 		static void SwitchToHeadBranch(this Repository repo, Reference headRef)
