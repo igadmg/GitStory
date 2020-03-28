@@ -2,7 +2,6 @@
   "profiles": {
     "GitStoryCLI": {
       "commandName": "Project",
-      "commandLineArgs": "fix",
       "workingDirectory": "D:\\workspace\\VsRepos\\GitStoryTest"
     }
   }
