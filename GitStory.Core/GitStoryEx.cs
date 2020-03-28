@@ -66,12 +66,13 @@ namespace GitStory.Core
 					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value))
 				, time);
 
-		public static Branch GetStoryBranch(this Repository repo, Branch branch, StoryBranchNameDelegate storyBranchNameFn)
+		public static Branch GetStoryBranch(this Repository repo, Branch branch, StoryBranchNameDelegate storyBranchNameFn, out string )
 		{
 			var id = repo.GetUuid();
 			var currentCommit = branch.Commits.First();
 
-			var storyBranchName = storyBranchNameFn(id, head, lastHeadCommit);
+			storyBranchName = storyBranchNameFn(id, branch, currentCommit);
+			return repo.Branches.Where(b => b.FriendlyName == storyBranchName).FirstOrDefault();
 		}
 
 		static void SaveStatus(this Repository repo, out Dictionary<string, FileStatus> filesStatus)
@@ -116,12 +117,7 @@ namespace GitStory.Core
 
 		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef)
 		{
-			var id = repo.GetUuid();
-			var head = repo.Head;
-			var lastHeadCommit = repo.Head.Commits.First();
-
-			var storyBranchName = storyBranchNameFn(id, head, lastHeadCommit);
-			var storyBranch = repo.Branches.Where(b => b.FriendlyName == storyBranchName).FirstOrDefault();
+			var storyBranch = repo.GetStoryBranch(repo.Head, storyBranchNameFn, out var storyBranchName);
 
 			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
 
