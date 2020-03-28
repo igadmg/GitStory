@@ -122,7 +122,7 @@ namespace GitStory.Core
 			var storyBranch = repo.GetStoryBranch(repo.Head, storyBranchNameFn, out var storyBranchName);
 			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
 
-			var headRef2 = repo.Refs.Where(r => r.CanonicalName == head.CanonicalName).FirstOrDefault();
+			var headRef2 = repo.Refs.Where(r => r.CanonicalName == repo.Head.CanonicalName).FirstOrDefault();
 			headRef = repo.Head.Reference;
 			repo.Refs.UpdateTarget("HEAD", storyBranch.Reference.CanonicalName);
 		}
