@@ -1,5 +1,6 @@
 ﻿using GitStory.Core;
 using LibGit2Sharp;
+using System;
 using System.IO;
 
 namespace GitStoryCLI
@@ -19,6 +20,10 @@ namespace GitStoryCLI
 				else if (args.Length == 1 && args[0] == "status")
 				{
 					repo.Status();
+				}
+				else if (args.Length == 2 && args[0] == "get-uuid")
+				{
+					Console.WriteLine(repo.GetUuid());
 				}
 				else if (args.Length == 2 && args[0] == "set-uuid")
 				{
