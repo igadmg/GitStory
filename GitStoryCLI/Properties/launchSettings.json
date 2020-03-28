@@ -2,7 +2,6 @@
   "profiles": {
     "GitStoryCLI": {
       "commandName": "Project",
-      "commandLineArgs": "change-uuid 75649d39badc4ab4be04b5715865d4f1",
       "workingDirectory": "D:\\workspace\\VsRepos\\GitStoryTest"
     }
   }
