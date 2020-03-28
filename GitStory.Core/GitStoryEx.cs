@@ -13,12 +13,19 @@ namespace GitStory.Core
 		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}_{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
+		public static string GenerateUuid(this Repository repo)
+		{
+			var author = repo.GetAuthorSignature(DateTime.Now);
+			//author.
+			return null;
+		}
+
 		public static string GetUuid(this Repository repo)
 		{
 			var uuid = repo.Config.Get<string>("gitstory.uuid")?.Value;
 			if (uuid == null)
 			{
-				uuid = Guid.NewGuid().ToString("N");
+				uuid = repo.GenerateUuid();
 				repo.SetUuid(uuid);
 			}
 
