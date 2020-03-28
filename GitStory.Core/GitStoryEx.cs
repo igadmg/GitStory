@@ -69,7 +69,7 @@ namespace GitStory.Core
 		public static Branch GetStoryBranch(this Repository repo, Branch branch, StoryBranchNameDelegate storyBranchNameFn)
 		{
 			var id = repo.GetUuid();
-			var lastHeadCommit = repo.Head.Commits.First();
+			var currentCommit = branch.Commits.First();
 
 			var storyBranchName = storyBranchNameFn(id, head, lastHeadCommit);
 		}
