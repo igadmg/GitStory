@@ -29,6 +29,10 @@ namespace GitStoryCLI
 				{
 					repo.SetUuid(args[1]);
 				}
+				else if (args.Length >= 2 && args[0] == "change-uuid")
+				{
+					repo.ChangeUuid(args[1], args.Length > 2 ? args[2] : string.Empty);
+				}
 				else
 				{
 					repo.Store();

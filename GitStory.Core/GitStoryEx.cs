@@ -39,6 +39,14 @@ namespace GitStory.Core
 			return repo;
 		}
 
+		public static Repository ChangeUuid(this Repository repo, string oldUuid, string newUuid)
+		{
+			if (newUuid.null_ws_())
+				newUuid = repo.GenerateUuid();
+
+			return repo;
+		}
+
 		public static Signature GetAuthorSignature(this Repository repo, DateTime time)
 			=> new Signature(
 				new Identity(
