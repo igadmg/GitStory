@@ -43,6 +43,11 @@ namespace GitStory.Core
 			if (newUuid.null_ws_())
 				newUuid = repo.GenerateUuid();
 
+			foreach (var b in repo.Branches)
+			{
+				int i = 0;
+			}
+
 			return repo;
 		}
 
