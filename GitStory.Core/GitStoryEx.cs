@@ -239,5 +239,7 @@ namespace GitStory.Core
 
 			repo.Refs.UpdateTarget("HEAD", headBranch.CanonicalName);
 		}
+
+		public static void Diff(this Repository repo)
 	}
 }
