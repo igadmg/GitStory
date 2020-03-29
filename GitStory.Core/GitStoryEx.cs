@@ -13,12 +13,18 @@ namespace GitStory.Core
 		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}_{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
+		public static string GenerateUuid(this Repository repo)
+		{
+			var author = repo.GetAuthorSignature(DateTime.Now);
+			return author.ToString().HashSHA1();
+		}
+
 		public static string GetUuid(this Repository repo)
 		{
 			var uuid = repo.Config.Get<string>("gitstory.uuid")?.Value;
 			if (uuid == null)
 			{
-				uuid = Guid.NewGuid().ToString("N");
+				uuid = repo.GenerateUuid();
 				repo.SetUuid(uuid);
 			}
 
@@ -28,6 +34,20 @@ namespace GitStory.Core
 		public static Repository SetUuid(this Repository repo, string uuid)
 		{
 			repo.Config.Set("gitstory.uuid", uuid);
+
+			return repo;
+		}
+
+		public static Repository ChangeUuid(this Repository repo, string oldUuid, string newUuid)
+		{
+			if (newUuid.null_ws_())
+				newUuid = repo.GenerateUuid();
+
+			foreach (var b in repo.Branches)
+			{
+				//int i = 0;
+				// TODO: rename branches.
+			}
 
 			return repo;
 		}
@@ -45,6 +65,17 @@ namespace GitStory.Core
 					repo.Config.GetValueOrDefault("gitstory.commiter.name", () => "Git Story"),
 					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value))
 				, time);
+
+		public static Branch GetStoryBranch(this Repository repo
+			, Branch branch, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
+		{
+			var id = repo.GetUuid();
+			var currentCommit = branch.Commits.First();
+
+			storyBranchName = storyBranchNameFn(id, branch, currentCommit);
+			var n = storyBranchName;
+			return repo.Branches.Where(b => b.FriendlyName == n).FirstOrDefault();
+		}
 
 		static void SaveStatus(this Repository repo, out Dictionary<string, FileStatus> filesStatus)
 		{
@@ -88,22 +119,11 @@ namespace GitStory.Core
 
 		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef)
 		{
-			var id = repo.GetUuid();
-			var head = repo.Head;
-			var lastHeadCommit = repo.Head.Commits.First();
-
-			var storyBranchName = storyBranchNameFn(id, head, lastHeadCommit);
-			var storyBranch = repo.Branches.Where(b => b.FriendlyName == storyBranchName).FirstOrDefault();
-
+			var storyBranch = repo.GetStoryBranch(repo.Head, storyBranchNameFn, out var storyBranchName);
 			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
 
-			headRef = repo.Refs.Where(r => r.CanonicalName == head.CanonicalName).FirstOrDefault();
-
-			var storyBranchRef = repo.Refs.Where(r => r.CanonicalName == storyBranch.CanonicalName).FirstOrDefault();
-
-			// got branches
-
-			repo.Refs.UpdateTarget("HEAD", storyBranchRef.CanonicalName);
+			headRef = (repo.Head.Reference as SymbolicReference).Target;
+			repo.Refs.UpdateTarget("HEAD", storyBranch.Reference.CanonicalName);
 		}
 
 		static void SwitchToHeadBranch(this Repository repo, Reference headRef)
