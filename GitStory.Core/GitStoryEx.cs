@@ -67,6 +67,10 @@ namespace GitStory.Core
 				, time);
 
 		public static Branch GetStoryBranch(this Repository repo
+			, Branch branch, StoryBranchNameDelegate storyBranchNameFn)
+			=> repo.GetStoryBranch(branch, storyBranchNameFn, out string storyBranchName);
+
+		public static Branch GetStoryBranch(this Repository repo
 			, Branch branch, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
 		{
 			var id = repo.GetUuid();
@@ -240,6 +244,12 @@ namespace GitStory.Core
 			repo.Refs.UpdateTarget("HEAD", headBranch.CanonicalName);
 		}
 
-		public static void Diff(this Repository repo)
+		public static void Diff(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
+		{
+			var branch = repo.GetStoryBranch(storyBranchNameFn);
+			if (branch == null)
+				return;
+
+		}
 	}
 }
