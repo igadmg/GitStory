@@ -244,7 +244,7 @@ namespace GitStory.Core
 			repo.Refs.UpdateTarget("HEAD", headBranch.CanonicalName);
 		}
 
-		public static void Diff(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
+		public static void Diff(this Repository repo)
 			=> repo.Diff(DefaultStoryBranchNameFn);
 
 		public static void Diff(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
