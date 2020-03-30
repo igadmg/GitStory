@@ -58,6 +58,12 @@ namespace GitStoryCLI
 			repo.ChangeUuid(oldUuid, newUuid);
 		}
 
+		[Command("diff")]
+		public async Task Diff()
+		{
+			repo.Diff();
+		}
+
 		public void Run()
 		{
 			repo.Store();
