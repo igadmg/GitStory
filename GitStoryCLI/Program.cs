@@ -10,10 +10,13 @@ namespace GitStoryCLI
 {
 	class Program : ConsoleAppBase
 	{
+		static string dir;
+		static Repository repo;
+
 		static async Task Main(string[] args)
 		{
-			string dir = Repository.Discover(Directory.GetCurrentDirectory());
-			using (var repo = new Repository(dir))
+			dir = Repository.Discover(Directory.GetCurrentDirectory());
+			using (repo = new Repository(dir))
 			{
 				await Host.CreateDefaultBuilder().RunConsoleAppFrameworkAsync<Program>(args);
 			}
@@ -24,26 +27,34 @@ namespace GitStoryCLI
 		{
 			repo.Fix();
 		}
-				else if (args.Length == 1 && args[0] == "status")
-				{
-					repo.Status();
-				}
-				else if (args.Length == 2 && args[0] == "get-uuid")
-				{
-					Console.WriteLine(repo.GetUuid());
-				}
-				else if (args.Length == 2 && args[0] == "set-uuid")
-				{
-					repo.SetUuid(args[1]);
-				}
-				else if (args.Length >= 2 && args[0] == "change-uuid")
-				{
-					repo.ChangeUuid(args[1], args.Length > 2 ? args[2] : string.Empty);
-				}
-				else
-				{
-					repo.Store();
-				}
+
+		[Command("status")]
+		public async Task Status()
+		{
+			repo.Status();
+		}
+
+		[Command("get-uuid")]
+		public async Task GetUuid()
+		{
+			Console.WriteLine(repo.GetUuid());
+		}
+
+		[Command("set-uuid")]
+		public async Task SetUuid([Option(0)] string uuid)
+		{
+			repo.SetUuid(uuid);
+		}
+
+		[Command("change-uuid")]
+		public async Task ChangeUuid([Option(0)] string oldUuid, [Option(1)] string newUuid)
+		{
+			repo.ChangeUuid(args[1], args.Length > 2 ? args[2] : string.Empty);
+		}
+
+		public void Run()
+		{
+			repo.Store();
 		}
 	}
 }
