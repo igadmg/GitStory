@@ -20,7 +20,7 @@ namespace GitStoryCLI
 		}
 
 		[Command("fix")]
-		public Task Fix()
+		public async Task Fix()
 		{
 			repo.Fix();
 		}
