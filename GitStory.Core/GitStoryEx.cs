@@ -246,7 +246,7 @@ namespace GitStory.Core
 
 		public static void Diff(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 		{
-			var branch = repo.GetStoryBranch(storyBranchNameFn);
+			var branch = repo.GetStoryBranch(repo.Head, storyBranchNameFn);
 			if (branch == null)
 				return;
 

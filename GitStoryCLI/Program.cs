@@ -1,11 +1,12 @@
-﻿using GitStory.Core;
+﻿using ConsoleAppFramework;
+using GitStory.Core;
 using LibGit2Sharp;
 using System;
 using System.IO;
 
 namespace GitStoryCLI
 {
-	class Program
+	class Program : ConsoleAppBase
 	{
 		static void Main(string[] args)
 		{
