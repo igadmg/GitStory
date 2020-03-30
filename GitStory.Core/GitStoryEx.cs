@@ -258,7 +258,8 @@ namespace GitStory.Core
 			{
 				if (prev != null)
 				{
-					repo.Diff.Compare<Patch>()
+					var p = repo.Diff.Compare<Patch>(commit.Tree, prev.Tree);
+					int i = 0;
 				}
 
 				prev = commit;
