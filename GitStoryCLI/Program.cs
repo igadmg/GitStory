@@ -1,6 +1,7 @@
 ﻿using ConsoleAppFramework;
 using GitStory.Core;
 using LibGit2Sharp;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,13 +13,17 @@ namespace GitStoryCLI
 		static async Task Main(string[] args)
 		{
 			string dir = Repository.Discover(Directory.GetCurrentDirectory());
-
 			using (var repo = new Repository(dir))
 			{
-				if (args.Length == 1 && args[0] == "fix")
-				{
-					repo.Fix();
-				}
+				await Host.CreateDefaultBuilder().RunConsoleAppFrameworkAsync<Program>(args);
+			}
+		}
+
+		[Command("fix")]
+		public Task Fix()
+		{
+			repo.Fix();
+		}
 				else if (args.Length == 1 && args[0] == "status")
 				{
 					repo.Status();
@@ -39,7 +44,6 @@ namespace GitStoryCLI
 				{
 					repo.Store();
 				}
-			}
 		}
 	}
 }
