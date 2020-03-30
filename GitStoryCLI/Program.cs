@@ -49,13 +49,13 @@ namespace GitStoryCLI
 		[Command("change-uuid")]
 		public async Task ChangeUuid([Option(0)] string oldUuid)
 		{
-			repo.ChangeUuid(oldUuid);
+			repo.ChangeUuid(oldUuid, string.Empty);
 		}
 
 		[Command("change-uuid")]
 		public async Task ChangeUuid([Option(0)] string oldUuid, [Option(1)] string newUuid)
 		{
-			repo.ChangeUuid(oldUuid, newUuid ?? string.Empty);
+			repo.ChangeUuid(oldUuid, newUuid);
 		}
 
 		public void Run()
