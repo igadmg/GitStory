@@ -3,12 +3,13 @@ using GitStory.Core;
 using LibGit2Sharp;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace GitStoryCLI
 {
 	class Program : ConsoleAppBase
 	{
-		static void Main(string[] args)
+		static async Task Main(string[] args)
 		{
 			string dir = Repository.Discover(Directory.GetCurrentDirectory());
 
