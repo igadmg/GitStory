@@ -253,7 +253,16 @@ namespace GitStory.Core
 			if (branch == null)
 				return;
 
-			repo.Diff.Compare<TreeChanges>
+			Commit prev = null;
+			foreach (var commit in branch.Commits.TakeWhile(c => c.Sha != repo.Head.Tip.Sha))
+			{
+				if (prev != null)
+				{
+					repo.Diff.Compare<Patch>()
+				}
+
+				prev = commit;
+			}
 		}
 	}
 }
