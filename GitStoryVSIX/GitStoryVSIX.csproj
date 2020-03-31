@@ -181,6 +181,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\libgit2sharp\LibGit2Sharp\LibGit2Sharp.csproj">
+      <Project>{4f8927bb-3e2b-44d3-b8c6-93147cc2b565}</Project>
+      <Name>LibGit2Sharp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GitStory.Core\GitStory.Core.csproj">
       <Project>{b94734fd-2d4c-493d-8a63-c59c9a9eb49b}</Project>
       <Name>GitStory.Core</Name>
