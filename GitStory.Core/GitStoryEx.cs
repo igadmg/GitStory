@@ -268,16 +268,10 @@ namespace GitStory.Core
 			if (branch == null)
 				return;
 
-			Commit prev = null;
-			foreach (var commit in branch.Commits.TakeWhile(c => c.Sha != repo.Head.Tip.Sha))
+			foreach ((var oldCommit, var newCommit) in branch.Commits.EnumCommitPairsUntil(repo.Head.Tip))
 			{
-				if (prev != null)
-				{
-					var p = repo.Diff.Compare<Patch>(commit.Tree, prev.Tree);
-					int i = 0;
-				}
-
-				prev = commit;
+				var p = repo.Diff.Compare<Patch>(oldCommit.Tree, newCommit.Tree);
+				int i = 0;
 			}
 		}
 	}
