@@ -244,6 +244,21 @@ namespace GitStory.Core
 			repo.Refs.UpdateTarget("HEAD", headBranch.CanonicalName);
 		}
 
+		private static IEnumerable<(Commit oldCommit, Commit newCommit)>
+			EnumCommitPairsUntil(this ICommitLog log, Commit endCommit)
+		{
+			Commit newCommit = null;
+			foreach (var oldCommit in log.TakeWhile(c => c.Sha != endCommit.Sha))
+			{
+				if (newCommit != null)
+				{
+					yield return (oldCommit, newCommit);
+				}
+
+				newCommit = oldCommit;
+			}
+		}
+
 		public static void Diff(this Repository repo)
 			=> repo.Diff(DefaultStoryBranchNameFn);
 
