@@ -10,7 +10,7 @@ namespace GitStory.Core
 	{
 		public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
 
-		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}_{commit.Sha}";
+		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}/{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
 		public static string GenerateUuid(this Repository repo)
@@ -65,6 +65,10 @@ namespace GitStory.Core
 					repo.Config.GetValueOrDefault("gitstory.commiter.name", () => "Git Story"),
 					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value))
 				, time);
+
+		public static Branch GetStoryBranch(this Repository repo
+			, Branch branch, StoryBranchNameDelegate storyBranchNameFn)
+			=> repo.GetStoryBranch(branch, storyBranchNameFn, out string storyBranchName);
 
 		public static Branch GetStoryBranch(this Repository repo
 			, Branch branch, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
@@ -238,6 +242,28 @@ namespace GitStory.Core
 			var headBranch = repo.Branches.Where(b => b.CanonicalName == headBranchName).FirstOrDefault();
 
 			repo.Refs.UpdateTarget("HEAD", headBranch.CanonicalName);
+		}
+
+		public static void Diff(this Repository repo)
+			=> repo.Diff(DefaultStoryBranchNameFn);
+
+		public static void Diff(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
+		{
+			var branch = repo.GetStoryBranch(repo.Head, storyBranchNameFn);
+			if (branch == null)
+				return;
+
+			Commit prev = null;
+			foreach (var commit in branch.Commits.TakeWhile(c => c.Sha != repo.Head.Tip.Sha))
+			{
+				if (prev != null)
+				{
+					var p = repo.Diff.Compare<Patch>(commit.Tree, prev.Tree);
+					int i = 0;
+				}
+
+				prev = commit;
+			}
 		}
 	}
 }

@@ -1,43 +1,72 @@
-﻿using GitStory.Core;
+﻿using ConsoleAppFramework;
+using GitStory.Core;
 using LibGit2Sharp;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace GitStoryCLI
 {
-	class Program
+	class Program : ConsoleAppBase
 	{
-		static void Main(string[] args)
-		{
-			string dir = Repository.Discover(Directory.GetCurrentDirectory());
+		static string dir;
+		static Repository repo;
 
-			using (var repo = new Repository(dir))
+		static async Task Main(string[] args)
+		{
+			dir = Repository.Discover(Directory.GetCurrentDirectory());
+			using (repo = new Repository(dir))
 			{
-				if (args.Length == 1 && args[0] == "fix")
-				{
-					repo.Fix();
-				}
-				else if (args.Length == 1 && args[0] == "status")
-				{
-					repo.Status();
-				}
-				else if (args.Length == 2 && args[0] == "get-uuid")
-				{
-					Console.WriteLine(repo.GetUuid());
-				}
-				else if (args.Length == 2 && args[0] == "set-uuid")
-				{
-					repo.SetUuid(args[1]);
-				}
-				else if (args.Length >= 2 && args[0] == "change-uuid")
-				{
-					repo.ChangeUuid(args[1], args.Length > 2 ? args[2] : string.Empty);
-				}
-				else
-				{
-					repo.Store();
-				}
+				await Host.CreateDefaultBuilder().RunConsoleAppFrameworkAsync<Program>(args);
 			}
+		}
+
+		[Command("fix")]
+		public async Task Fix()
+		{
+			repo.Fix();
+		}
+
+		[Command("status")]
+		public async Task Status()
+		{
+			repo.Status();
+		}
+
+		[Command("get-uuid")]
+		public async Task GetUuid()
+		{
+			Console.WriteLine(repo.GetUuid());
+		}
+
+		[Command("set-uuid")]
+		public async Task SetUuid([Option(0)] string uuid)
+		{
+			repo.SetUuid(uuid);
+		}
+
+		[Command("change-uuid")]
+		public async Task ChangeUuid([Option(0)] string oldUuid)
+		{
+			repo.ChangeUuid(oldUuid, string.Empty);
+		}
+
+		[Command("change-uuid")]
+		public async Task ChangeUuid([Option(0)] string oldUuid, [Option(1)] string newUuid)
+		{
+			repo.ChangeUuid(oldUuid, newUuid);
+		}
+
+		[Command("diff")]
+		public async Task Diff()
+		{
+			repo.Diff();
+		}
+
+		public void Run()
+		{
+			repo.Store();
 		}
 	}
 }

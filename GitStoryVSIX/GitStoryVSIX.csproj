@@ -9,6 +9,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <UseCodebase>true</UseCodebase>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -27,7 +28,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GitStoryVSIX</RootNamespace>
     <AssemblyName>GitStoryVSIX</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
@@ -91,9 +92,6 @@
     </Reference>
     <Reference Include="EnvDTE90, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="LibGit2Sharp, Version=0.26.0.0, Culture=neutral, PublicKeyToken=7cbde695407f0333, processorArchitecture=MSIL">
-      <HintPath>..\packages\LibGit2Sharp.0.26.2\lib\net46\LibGit2Sharp.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.CommandBars, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -184,6 +182,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\libgit2sharp\LibGit2Sharp\LibGit2Sharp.csproj">
+      <Project>{4f8927bb-3e2b-44d3-b8c6-93147cc2b565}</Project>
+      <Name>LibGit2Sharp</Name>
+      <AdditionalProperties>TargetFramework=net46</AdditionalProperties>
+    </ProjectReference>
     <ProjectReference Include="..\GitStory.Core\GitStory.Core.csproj">
       <Project>{b94734fd-2d4c-493d-8a63-c59c9a9eb49b}</Project>
       <Name>GitStory.Core</Name>
