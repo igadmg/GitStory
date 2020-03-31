@@ -268,9 +268,9 @@ namespace GitStory.Core
 			if (branch == null)
 				return;
 
-			foreach ((var oldCommit, var newCommit) in branch.Commits.EnumCommitPairsUntil(repo.Head.Tip))
+			foreach (var p in branch.Commits.EnumCommitPairsUntil(repo.Head.Tip))
 			{
-				var p = repo.Diff.Compare<Patch>(oldCommit.Tree, newCommit.Tree);
+				var diff = repo.Diff.Compare<Patch>(p.oldCommit.Tree, p.newCommit.Tree);
 				int i = 0;
 			}
 		}
