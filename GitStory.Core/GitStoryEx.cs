@@ -268,10 +268,18 @@ namespace GitStory.Core
 			if (branch == null)
 				return;
 
+			Dictionary<string, SourceHeatmap> heatmaps = new Dictionary<string, SourceHeatmap>();
+
 			foreach (var p in branch.Commits.EnumCommitPairsUntil(repo.Head.Tip))
 			{
 				var diff = repo.Diff.Compare<Patch>(p.oldCommit.Tree, p.newCommit.Tree);
-				int i = 0;
+
+				foreach (var change in diff)
+				{
+					var heatmap = heatmaps.GetOrAdd(change.Path, s => new SourceHeatmap(s));
+
+					heatmap.Prepend(change);
+				}
 			}
 		}
 	}
