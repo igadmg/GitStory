@@ -21,8 +21,10 @@ namespace GitStoryCLI
 				var m = MethodBase.GetCurrentMethod();
 				foreach (var l in m.GetMethodBody().LocalVariables)
 				{
-					Console.WriteLine(str + " " + l);
+					Console.WriteLine(l);
 				}
+
+				return "";
 			};
 
 			fn("", null, null);
