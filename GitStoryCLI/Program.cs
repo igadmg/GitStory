@@ -18,7 +18,8 @@ namespace GitStoryCLI
 		{
 			string str = "rere";
 
-			foreach (var l in MethodBase.GetCurrentMethod().GetMethodBody().LocalVariables)
+			var m = MethodBase.GetCurrentMethod();
+			foreach (var l in m.GetMethodBody().LocalVariables)
 			{
 				Console.WriteLine(str + " " + l);
 			}
