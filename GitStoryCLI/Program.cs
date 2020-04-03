@@ -20,7 +20,7 @@ namespace GitStoryCLI
 
 			foreach (var l in MethodBase.GetCurrentMethod().GetMethodBody().LocalVariables)
 			{
-				Console.WriteLine(l);
+				Console.WriteLine(str + " " + l);
 			}
 
 			dir = Repository.Discover(Directory.GetCurrentDirectory());
