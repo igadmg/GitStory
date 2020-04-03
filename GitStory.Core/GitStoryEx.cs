@@ -8,6 +8,7 @@ namespace GitStory.Core
 {
 	public static class GitStoryEx
 	{
+		public class StoryBranchNameDelegateParameters { public string id; public Branch branch; public Commit commit; }
 		public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
 
 		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, branch, commit) => $"story/{id}/{branch.FriendlyName}/{commit.Sha}";
