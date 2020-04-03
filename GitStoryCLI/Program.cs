@@ -16,13 +16,16 @@ namespace GitStoryCLI
 
 		static async Task Main(string[] args)
 		{
-			string str = "rere";
-
-			var m = MethodBase.GetCurrentMethod();
-			foreach (var l in m.GetMethodBody().LocalVariables)
+			GitStoryEx.StoryBranchNameDelegate fn = (id, branch, commit) =>
 			{
-				Console.WriteLine(str + " " + l);
-			}
+				var m = MethodBase.GetCurrentMethod();
+				foreach (var l in m.GetMethodBody().LocalVariables)
+				{
+					Console.WriteLine(str + " " + l);
+				}
+			};
+
+			fn("", null, null);
 
 			dir = Repository.Discover(Directory.GetCurrentDirectory());
 			using (repo = new Repository(dir))
