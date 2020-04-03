@@ -18,13 +18,17 @@ namespace GitStoryCLI
 
 		static async Task Main(string[] args)
 		{
+			var branchNamePattern = "story/{id}/{branch.FriendlyName}/{commit.Sha}";
+			var barnchNameScript
 			GitStoryEx.StoryBranchNameDelegate fn = (id, branch, commit) =>
 			{
-				return "story/{id}/{branch.FriendlyName}/{commit.Sha}_somestuff".format(p => {
-					return CSharpScript.EvaluateAsync<string>(p
-						, globals: new GitStoryEx.StoryBranchNameDelegateParameters { id = id, branch = branch, commit = commit })
-					.Result;
-				});
+				var globals = new GitStoryEx.StoryBranchNameDelegateParameters {
+					id = id, branch = branch, commit = commit
+				};
+				return CSharpScript.EvaluateAsync<string>(p, globals: globals).Result;
+				//return "story/{id}/{branch.FriendlyName}/{commit.Sha}".format(p => {
+				//	return CSharpScript.EvaluateAsync<string>(p, globals: globals).Result;
+				//});
 			};
 
 			dir = Repository.Discover(Directory.GetCurrentDirectory());
