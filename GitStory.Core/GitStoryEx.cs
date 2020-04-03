@@ -10,7 +10,7 @@ namespace GitStory.Core
 	{
 		public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
 
-		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}/{commit.Sha}";
+		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, branch, commit) => $"story/{id}/{branch.FriendlyName}/{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
 		public static string GenerateUuid(this Repository repo)
