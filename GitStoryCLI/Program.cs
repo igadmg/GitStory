@@ -19,13 +19,15 @@ namespace GitStoryCLI
 		static async Task Main(string[] args)
 		{
 			var branchNamePattern = "story/{id}/{branch.FriendlyName}/{commit.Sha}";
-			var barnchNameScript = $"$\"{branchNamePattern}\"";
+			var barnchNameScript = CSharpScript.Create<string>($"$\"{branchNamePattern}\""
+				, globalsType: typeof(GitStoryEx.StoryBranchNameDelegateParameters));
+			barnchNameScript.Compile();
 			GitStoryEx.StoryBranchNameDelegate fn = (id, branch, commit) =>
 			{
 				var globals = new GitStoryEx.StoryBranchNameDelegateParameters {
 					id = id, branch = branch, commit = commit
 				};
-				return CSharpScript.EvaluateAsync<string>(barnchNameScript, globals: globals).Result;
+				return barnchNameScript.RunAsync(globals: globals).Result;
 				//return "story/{id}/{branch.FriendlyName}/{commit.Sha}".format(p => {
 				//	return CSharpScript.EvaluateAsync<string>(p, globals: globals).Result;
 				//});
