@@ -21,7 +21,7 @@ namespace GitStoryCLI
 			GitStoryEx.StoryBranchNameDelegate fn = (id, branch, commit) =>
 			{
 				return "story/{id}/{branch.FriendlyName}/{commit.Sha}_somestuff".format(p => {
-					return CSharpScript.EvaluateAsync<string>(p, globals: new { id, branch, commit}).Result;
+					return CSharpScript.EvaluateAsync<string>(p, globals: new { id, branch, commit}.ToExpando()).Result;
 				});
 			};
 
