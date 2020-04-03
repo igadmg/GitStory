@@ -22,15 +22,13 @@ namespace GitStoryCLI
 			var barnchNameScript = CSharpScript.Create<string>($"$\"{branchNamePattern}\""
 				, globalsType: typeof(GitStoryEx.StoryBranchNameDelegateParameters));
 			barnchNameScript.Compile();
+
 			GitStoryEx.StoryBranchNameDelegate fn = (id, branch, commit) =>
 			{
 				var globals = new GitStoryEx.StoryBranchNameDelegateParameters {
 					id = id, branch = branch, commit = commit
 				};
-				return barnchNameScript.RunAsync(globals: globals).Result;
-				//return "story/{id}/{branch.FriendlyName}/{commit.Sha}".format(p => {
-				//	return CSharpScript.EvaluateAsync<string>(p, globals: globals).Result;
-				//});
+				return barnchNameScript.RunAsync(globals).Result.ReturnValue;
 			};
 
 			dir = Repository.Discover(Directory.GetCurrentDirectory());
