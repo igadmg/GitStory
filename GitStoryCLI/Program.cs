@@ -16,6 +16,8 @@ namespace GitStoryCLI
 
 		static async Task Main(string[] args)
 		{
+			string str = "rere";
+
 			foreach (var l in MethodBase.GetCurrentMethod().GetMethodBody().LocalVariables)
 			{
 				Console.WriteLine(l);
