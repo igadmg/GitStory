@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using SystemEx;
 
 namespace GitStoryCLI
 {
@@ -18,12 +19,7 @@ namespace GitStoryCLI
 		{
 			GitStoryEx.StoryBranchNameDelegate fn = (id, branch, commit) =>
 			{
-				foreach (var l in MethodBase.GetCurrentMethod().GetParameters())
-				{
-					Console.WriteLine(l);
-				}
-
-				return "";
+				return "story/{id}/{branch.FriendlyName}/{commit.Sha}_somestuff".format();
 			};
 
 			fn("", null, null);
