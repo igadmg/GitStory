@@ -19,7 +19,9 @@ namespace GitStoryCLI
 		{
 			GitStoryEx.StoryBranchNameDelegate fn = (id, branch, commit) =>
 			{
-				return "story/{id}/{branch.FriendlyName}/{commit.Sha}_somestuff".format();
+				return "story/{id}/{branch.FriendlyName}/{commit.Sha}_somestuff".format(p => {
+					return $"{p}";
+				});
 			};
 
 			fn("", null, null);
