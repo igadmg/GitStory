@@ -4,6 +4,7 @@ using LibGit2Sharp;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace GitStoryCLI
@@ -15,6 +16,11 @@ namespace GitStoryCLI
 
 		static async Task Main(string[] args)
 		{
+			foreach (var l in MethodBase.GetCurrentMethod().GetMethodBody().LocalVariables)
+			{
+				Console.WriteLine(l);
+			}
+
 			dir = Repository.Discover(Directory.GetCurrentDirectory());
 			using (repo = new Repository(dir))
 			{
