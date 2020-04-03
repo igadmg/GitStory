@@ -18,8 +18,7 @@ namespace GitStoryCLI
 		{
 			GitStoryEx.StoryBranchNameDelegate fn = (id, branch, commit) =>
 			{
-				var m = MethodBase.GetCurrentMethod();
-				foreach (var l in m.GetMethodBody().LocalVariables)
+				foreach (var l in MethodBase.GetCurrentMethod().GetParameters())
 				{
 					Console.WriteLine(l);
 				}
