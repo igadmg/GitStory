@@ -181,7 +181,6 @@ namespace GitStory.Core
 					.Where(e => e != null)
 					.Count();
 					
-					
 				foreach (var sm in )
 				{
 					if ()
