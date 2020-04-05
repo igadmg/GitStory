@@ -23,14 +23,12 @@ namespace GitStoryVSIX
 
 	public class RunningDocTableEvents : IVsRunningDocTableEvents3, IDisposable
 	{
-		GitStoryVSPackage package;
 		RunningDocumentTable rdt;
 		private uint cookie;
 
 		public RunningDocTableEvents(GitStoryVSPackage serviceProvider,
 			Action OnAfterSaveFn)
 		{
-			package = serviceProvider;
 			rdt = new RunningDocumentTable(serviceProvider);
 			cookie = rdt.Advise(this);
 		}
