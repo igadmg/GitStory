@@ -31,6 +31,8 @@ namespace GitStoryVSIX
 		{
 			rdt = new RunningDocumentTable(serviceProvider);
 			cookie = rdt.Advise(this);
+
+			this.OnAfterSaveFn = OnAfterSaveFn;
 		}
 
 		public void Dispose()
