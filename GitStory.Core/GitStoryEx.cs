@@ -165,16 +165,29 @@ namespace GitStory.Core
 				if (st.IsEmpty)
 					return repo;
 
-				foreach (var sm in repo.Submodules)
+				repo.Submodules
+					.Where(sm => sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
+					.Select(sm => {
+						try
+						{
+							new Repository(sm.Path).Store(storyBranchNameFn, message);
+						}
+						catch (Exception e) {
+							return e;
+						}
+						return null;
+					})
+					//.AggregateExecption((ae, e, iae) => { ae.})
+					.Where(e => e != null)
+					.Count();
+					
+					
+				foreach (var sm in )
 				{
-					if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
+					if ()
 						continue;
 
-					try
-					{
-						new Repository(sm.Path).Store(storyBranchNameFn, message);
-					}
-					catch { }
+					
 				}
 
 				using (new ToStoryBranch(repo, storyBranchNameFn))
