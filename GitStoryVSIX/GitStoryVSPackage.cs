@@ -72,7 +72,10 @@ namespace GitStoryVSIX
 			try
 			{
 				dte = GetGlobalService(typeof(SDTE)) as DTE2;
-				rdte = new RunningDocTableEvents(this);
+				rdte = new RunningDocTableEvents(this,
+					OnAfterSaveFn: () => {
+						package.repo?.Store();
+					});
 				var solutionDir = Path.GetDirectoryName(dte.Solution.FileName);
 				repo = new Repository(solutionDir);
 			}
