@@ -172,22 +172,12 @@ namespace GitStory.Core
 						{
 							new Repository(sm.Path).Store(storyBranchNameFn, message);
 						}
-						catch (Exception e) {
-							return e;
-						}
+						catch (Exception e) return e;
 						return null;
 					})
 					//.AggregateExecption((ae, e, iae) => { ae.})
 					.Where(e => e != null)
 					.Count();
-					
-				foreach (var sm in )
-				{
-					if ()
-						continue;
-
-					
-				}
 
 				using (new ToStoryBranch(repo, storyBranchNameFn))
 				{
