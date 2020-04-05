@@ -172,7 +172,7 @@ namespace GitStory.Core
 						{
 							new Repository(sm.Path).Store(storyBranchNameFn, message);
 						}
-						catch (Exception e) return e;
+						catch (Exception e) { return e; }
 						return null;
 					})
 					//.AggregateExecption((ae, e, iae) => { ae.})
