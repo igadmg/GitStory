@@ -73,11 +73,22 @@ namespace GitStoryVSIX
 			try
 			{
 				dte = GetGlobalService(typeof(SDTE)) as DTE2;
+				var statusBar = await GetServiceAsync(typeof(SVsStatusbar)) as IVsStatusbar;
+
+				Action<string> print = str => {
+					statusBar.IsFrozen(out int frozen);
+					bool unlocked = frozen == 0;
+					if (unlocked)
+					{
+						statusBar.SetText(str);
+					}
+				};
 
 				var solutionDir = Path.GetDirectoryName(dte.Solution.FileName);
 				repo = new Repository(solutionDir);
 				rdte = new RunningDocTableEvents(this,
 					OnAfterSaveFn: () => {
+						print("Saving Story...");
 						repo?.Store();
 					});
 			}
