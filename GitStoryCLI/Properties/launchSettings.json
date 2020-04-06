@@ -2,7 +2,7 @@
   "profiles": {
     "GitStoryCLI": {
       "commandName": "Project",
-      "commandLineArgs": "diff",
+      "commandLineArgs": "rename-branches",
       "workingDirectory": "D:\\workspace\\VsRepos\\GitStoryTest"
     }
   }
