@@ -146,7 +146,7 @@ namespace GitStory.Core
 						{
 							repo.Submodules.ForEachSubmodule(sm =>
 							{
-								var i = newStoryBranch.Tip.Tree[sm.Path];
+								var item = newStoryBranch.Tip.Tree[sm.Path];
 								int f = 0;
 							});
 
