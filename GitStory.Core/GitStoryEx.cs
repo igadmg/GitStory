@@ -135,6 +135,11 @@ namespace GitStory.Core
 				if (oldStoryBranch != null)
 				{
 					var newStoryBranch = repo.GetStoryBranch(repo.Head, commit, newBranchNameFn);
+
+					if (newStoryBranch != null)
+					{
+						int i = 0;
+					}
 				}
 			}
 
