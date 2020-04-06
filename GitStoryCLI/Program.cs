@@ -54,7 +54,7 @@ namespace GitStoryCLI
 		}
 
 		[Command("rename-branches")]
-		public async Task RenameBranches([Option(0)] string oldPattern, [Option(1)] string newPattern)
+		public async Task RenameBranches([Option(0)] string oldPattern, [Option(1)] string newPattern = null)
 		{
 			repo.RenameStoryBranches(oldPattern, newPattern);
 		}
