@@ -102,16 +102,21 @@ namespace GitStory.Core
 
 		public static Branch GetStoryBranch(this Repository repo
 			, Branch branch, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
-			=> repo.GetStoryBranch(branch, branch.Tip, storyBranchNameFn, out storyBranchName);
+			=> repo.GetStoryBranch(repo.GetUuid(), branch, branch.Tip, storyBranchNameFn, out storyBranchName);
 
 		public static Branch GetStoryBranch(this Repository repo
-			, Branch branch, Commit commit
+			, Branch branch, Commit commit, StoryBranchNameDelegate storyBranchNameFn)
+			=> repo.GetStoryBranch(branch, commit, storyBranchNameFn, out string storyBranchName);
+
+		public static Branch GetStoryBranch(this Repository repo
+			, Branch branch, Commit commit, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
+			=> repo.GetStoryBranch(repo.GetUuid(), branch, commit, storyBranchNameFn, out storyBranchName);
+
+		public static Branch GetStoryBranch(this Repository repo
+			, string id, Branch branch, Commit commit
 			, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
 		{
-			var id = repo.GetUuid();
-			
-
-			storyBranchName = storyBranchNameFn(id, branch, currentCommit);
+			storyBranchName = storyBranchNameFn(id, branch, commit);
 			var n = storyBranchName;
 			return repo.Branches.Where(b => b.FriendlyName == n).FirstOrDefault();
 		}
