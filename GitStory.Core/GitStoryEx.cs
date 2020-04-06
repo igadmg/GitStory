@@ -133,9 +133,9 @@ namespace GitStory.Core
 		{
 			var now = DateTime.Now;
 
-			using (var head = LockBranch(repo.Head))
+			using (var head = DisposableLock.Lock(repo.Head, h => Commands.Checkout(h)))
 			{
-				foreach (var commit in ((Branch)head).Commits)
+				foreach (var commit in head.Value.Commits)
 				{
 					var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
 					if (oldStoryBranch != null)
