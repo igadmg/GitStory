@@ -8,9 +8,10 @@ namespace GitStory.Core
 {
 	public static class GitStoryEx
 	{
+		public class StoryBranchNameDelegateParameters { public string id; public Branch branch; public Commit commit; }
 		public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
 
-		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, head, commit) => $"story/{id}/{head.FriendlyName}/{commit.Sha}";
+		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, branch, commit) => $"story/{id}/{branch.FriendlyName}/{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
 		public static string GenerateUuid(this Repository repo)
@@ -164,17 +165,19 @@ namespace GitStory.Core
 				if (st.IsEmpty)
 					return repo;
 
-				foreach (var sm in repo.Submodules)
-				{
-					if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
-						continue;
-
-					try
-					{
-						new Repository(sm.Path).Store(storyBranchNameFn, message);
-					}
-					catch { }
-				}
+				repo.Submodules
+					.Where(sm => sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
+					.Select(sm => {
+						try
+						{
+							new Repository(sm.Path).Store(storyBranchNameFn, message);
+						}
+						catch (Exception e) { return e; }
+						return null;
+					})
+					//.AggregateExecption((ae, e, iae) => { ae.})
+					.Where(e => e != null)
+					.Count();
 
 				using (new ToStoryBranch(repo, storyBranchNameFn))
 				{
@@ -244,6 +247,21 @@ namespace GitStory.Core
 			repo.Refs.UpdateTarget("HEAD", headBranch.CanonicalName);
 		}
 
+		private static IEnumerable<(Commit oldCommit, Commit newCommit)>
+			EnumCommitPairsUntil(this ICommitLog log, Commit endCommit)
+		{
+			Commit newCommit = null;
+			foreach (var oldCommit in log.TakeWhile(c => c.Sha != endCommit.Sha))
+			{
+				if (newCommit != null)
+				{
+					yield return (oldCommit, newCommit);
+				}
+
+				newCommit = oldCommit;
+			}
+		}
+
 		public static void Diff(this Repository repo)
 			=> repo.Diff(DefaultStoryBranchNameFn);
 
@@ -253,16 +271,18 @@ namespace GitStory.Core
 			if (branch == null)
 				return;
 
-			Commit prev = null;
-			foreach (var commit in branch.Commits.TakeWhile(c => c.Sha != repo.Head.Tip.Sha))
-			{
-				if (prev != null)
-				{
-					var p = repo.Diff.Compare<Patch>(commit.Tree, prev.Tree);
-					int i = 0;
-				}
+			Dictionary<string, SourceHeatmap> heatmaps = new Dictionary<string, SourceHeatmap>();
 
-				prev = commit;
+			foreach (var p in branch.Commits.EnumCommitPairsUntil(repo.Head.Tip))
+			{
+				var diff = repo.Diff.Compare<Patch>(p.oldCommit.Tree, p.newCommit.Tree);
+
+				foreach (var change in diff)
+				{
+					var heatmap = heatmaps.GetOrAdd(change.Path, s => new SourceHeatmap(s));
+
+					heatmap.Prepend(change);
+				}
 			}
 		}
 	}

@@ -23,15 +23,16 @@ namespace GitStoryVSIX
 
 	public class RunningDocTableEvents : IVsRunningDocTableEvents3, IDisposable
 	{
-		GitStoryVSPackage package;
 		RunningDocumentTable rdt;
 		private uint cookie;
 
-		public RunningDocTableEvents(GitStoryVSPackage serviceProvider)
+		public RunningDocTableEvents(GitStoryVSPackage serviceProvider,
+			Action OnAfterSaveFn)
 		{
-			package = serviceProvider;
 			rdt = new RunningDocumentTable(serviceProvider);
 			cookie = rdt.Advise(this);
+
+			this.OnAfterSaveFn = OnAfterSaveFn;
 		}
 
 		public void Dispose()
@@ -49,13 +50,14 @@ namespace GitStoryVSIX
 		public int OnAfterAttributeChangeEx(uint docCookie, uint grfAttribs, IVsHierarchy pHierOld, uint itemidOld, string pszMkDocumentOld, IVsHierarchy pHierNew, uint itemidNew, string pszMkDocumentNew) => VSConstants.S_OK;
 		public int OnBeforeSave(uint docCookie) => VSConstants.S_OK;
 
+		Action OnAfterSaveFn;
 		public int OnAfterSave(uint docCookie)
 		{
 			var dirtyCount = rdt.Count(d => d.IsDirty());
 
 			if (dirtyCount == 0)
 			{
-				package.repo?.Store();
+				OnAfterSaveFn();
 			}
 
 			return VSConstants.S_OK;

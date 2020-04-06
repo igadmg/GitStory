@@ -1,4 +1,5 @@
 ﻿using EnvDTE80;
+using GitStory.Core;
 using LibGit2Sharp;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -72,9 +73,13 @@ namespace GitStoryVSIX
 			try
 			{
 				dte = GetGlobalService(typeof(SDTE)) as DTE2;
-				rdte = new RunningDocTableEvents(this);
+
 				var solutionDir = Path.GetDirectoryName(dte.Solution.FileName);
 				repo = new Repository(solutionDir);
+				rdte = new RunningDocTableEvents(this,
+					OnAfterSaveFn: () => {
+						repo?.Store();
+					});
 			}
 			catch
 			{
