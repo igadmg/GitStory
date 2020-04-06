@@ -145,20 +145,9 @@ namespace GitStory.Core
 							repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now));
 							repo.Branches.Remove(oldStoryBranch);
 
-							foreach (var conflict in repo.RetrieveStatus(new StatusOptions { IncludeIgnored = false }))
+							foreach (var conflict in repo.Index.Conflicts))
 							{
-								if (conflict.State == FileStatus.Conflicted)
-								{
-									try
-									{
-										repo.CheckoutPaths(newStoryBranch.CanonicalName
-											, new string[] { conflict.FilePath }, null);
-									}
-									catch (Exception e)
-									{
-										int i = 0;
-									}
-								}
+								int i = 0;
 							}
 						}
 					}
