@@ -142,9 +142,11 @@ namespace GitStory.Core
 					{
 						using (new CheckoutBranch(repo, newStoryBranch))
 						{
-							var result = repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now));
-							repo.Branches.Remove(oldStoryBranch);
-
+							var result = repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now),
+								new MergeOptions()
+								{
+									FileConflictStrategy = CheckoutFileConflictStrategy.Ours
+								});
 							foreach (var conflict in repo.Index.Conflicts)
 							{
 								int i = 0;
