@@ -141,7 +141,7 @@ namespace GitStory.Core
 					.Select(p => {
 						var b = repo.GetStoryBranch(head, p.commit, newBranchNameFn, out var newStoryBranchName);
 						return (p.commit, p.oldStoryBranch, newStoryBranch: b, newStoryBranchName);
-					})
+					}))
 				{
 					if (newStoryBranch != null)
 					{
