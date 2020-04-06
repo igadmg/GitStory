@@ -133,6 +133,7 @@ namespace GitStory.Core
 		{
 			var now = DateTime.Now;
 
+			var head = repo.Head;
 			foreach (var commit in repo.Head.Commits)
 			{
 				var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
