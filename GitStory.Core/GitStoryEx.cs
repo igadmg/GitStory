@@ -144,7 +144,7 @@ namespace GitStory.Core
 					{
 						//using (new CheckoutBranch(repo, newStoryBranch))
 						{
-							repo.Rebase.Start(newStoryBranch.Tip, commit, oldStoryBranch.Tip, repo.GetCommiterSignature)
+							repo.Rebase.Start(newStoryBranch.Tip, commit, oldStoryBranch.Tip, repo.GetCommiterIdentity(), new RebaseOptions { });
 
 							var result = repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now),
 								new MergeOptions()
