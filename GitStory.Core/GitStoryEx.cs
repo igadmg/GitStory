@@ -156,9 +156,10 @@ namespace GitStory.Core
 					catch (Exception e) { return e; }
 					return null;
 				})
-				.Where(e => e != null);
+				.Where(e => e != null)
+				.ToArray();
 
-			if (exceptions.Count() != 0) // here we actually do work
+			if (exceptions.Length != 0)
 				throw new AggregateException(exceptions);
 
 			return submodules;
