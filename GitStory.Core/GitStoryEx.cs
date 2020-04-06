@@ -150,13 +150,13 @@ namespace GitStory.Core
 
 		static IEnumerable<Submodule> ForEachSubmodule(this IEnumerable<Submodule> submodules, Action<Submodule> fn)
 		{
-			var exceptions = submodules.Select(sm => {
-				try { fn(sm); }
-				catch (Exception e) { return e; }
-				return null;
-			})
-					//.AggregateExecption((ae, e, iae) => { ae.})
-					.Where(e => e != null);
+			var exceptions =
+				submodules.Select(sm => {
+					try { fn(sm); }
+					catch (Exception e) { return e; }
+					return null;
+				})
+				.Where(e => e != null);
 
 			if (exceptions.Count() != 0) // here we actually do work
 				throw new AggregateException(exceptions);
