@@ -148,6 +148,15 @@ namespace GitStory.Core
 									FileConflictStrategy = CheckoutFileConflictStrategy.Ours
 								});
 							repo.Branches.Remove(oldStoryBranch);
+							foreach (var c in repo.Index.Conflicts.ToArray())
+							{
+								repo.Index.Add(c.Ours.Path);
+							}
+
+							var now = DateTime.Now;
+							repo.Commit("merge"
+								, repo.GetAuthorSignature(now)
+								, repo.GetCommiterSignature(now));
 						}
 					}
 					else
