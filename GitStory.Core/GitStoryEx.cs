@@ -102,9 +102,14 @@ namespace GitStory.Core
 
 		public static Branch GetStoryBranch(this Repository repo
 			, Branch branch, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
+			=> repo.GetStoryBranch(branch, branch.Tip, storyBranchNameFn, out storyBranchName);
+
+		public static Branch GetStoryBranch(this Repository repo
+			, Branch branch, Commit commit
+			, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
 		{
 			var id = repo.GetUuid();
-			var currentCommit = branch.Commits.First();
+			
 
 			storyBranchName = storyBranchNameFn(id, branch, currentCommit);
 			var n = storyBranchName;
@@ -121,7 +126,7 @@ namespace GitStory.Core
 		{
 			foreach (var commit in repo.Head.Commits)
 			{
-
+				repo.GetStoryBranch(repo.Head)
 			}
 
 			return repo;
