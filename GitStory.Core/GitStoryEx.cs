@@ -147,7 +147,11 @@ namespace GitStory.Core
 
 							foreach (var conflict in repo.RetrieveStatus(new StatusOptions { IncludeIgnored = false }))
 							{
-								int i = 0;
+								if (conflict.State == FileStatus.Conflicted)
+								{
+									repo.CheckoutPaths(newStoryBranch.CanonicalName
+										, new string[] { conflict.FilePath }, null);
+								}
 							}
 						}
 					}
