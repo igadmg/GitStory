@@ -1,16 +1,14 @@
 ﻿using ConsoleAppFramework;
 using GitStory.Core;
 using LibGit2Sharp;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
-using SystemEx;
 
 namespace GitStoryCLI
 {
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 	class Program : ConsoleAppBase
 	{
 		static string dir;
@@ -18,24 +16,9 @@ namespace GitStoryCLI
 
 		static async Task Main(string[] args)
 		{
-			var branchNamePattern = "story/{id}/{branch.FriendlyName}/{commit.Sha}";
-			var barnchNameScript = CSharpScript.Create<string>($"$\"{branchNamePattern}\""
-				, globalsType: typeof(GitStoryEx.StoryBranchNameDelegateParameters));
-			barnchNameScript.Compile();
-
-			GitStoryEx.StoryBranchNameDelegate fn = (id, branch, commit) =>
-			{
-				var globals = new GitStoryEx.StoryBranchNameDelegateParameters {
-					id = id, branch = branch, commit = commit
-				};
-				return barnchNameScript.RunAsync(globals).Result.ReturnValue;
-			};
-
 			dir = Repository.Discover(Directory.GetCurrentDirectory());
 			using (repo = new Repository(dir))
 			{
-				var s = fn(repo.GetUuid(), repo.Head, repo.Head.Tip);
-
 				await Host.CreateDefaultBuilder().RunConsoleAppFrameworkAsync<Program>(args);
 			}
 		}
@@ -65,15 +48,15 @@ namespace GitStoryCLI
 		}
 
 		[Command("change-uuid")]
-		public async Task ChangeUuid([Option(0)] string oldUuid)
-		{
-			repo.ChangeUuid(oldUuid, string.Empty);
-		}
-
-		[Command("change-uuid")]
-		public async Task ChangeUuid([Option(0)] string oldUuid, [Option(1)] string newUuid)
+		public async Task ChangeUuid([Option(0)] string oldUuid, [Option(1)] string newUuid = null)
 		{
 			repo.ChangeUuid(oldUuid, newUuid);
+		}
+
+		[Command("rename-branches")]
+		public async Task RenameBranches([Option(0)] string oldPattern, [Option(1)] string newPattern = null)
+		{
+			repo.RenameStoryBranches(oldPattern, newPattern);
 		}
 
 		[Command("diff")]
@@ -87,4 +70,5 @@ namespace GitStoryCLI
 			repo.Store();
 		}
 	}
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 }

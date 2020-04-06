@@ -1,4 +1,5 @@
 ﻿using LibGit2Sharp;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,10 +7,12 @@ using SystemEx;
 
 namespace GitStory.Core
 {
+	public class StoryBranchNameDelegateParameters { public string id; public Branch branch; public Commit commit; }
+	public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
+	
 	public static class GitStoryEx
 	{
-		public class StoryBranchNameDelegateParameters { public string id; public Branch branch; public Commit commit; }
-		public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
+		static Dictionary<string, StoryBranchNameDelegate> StoryBranchNameFns = new Dictionary<string, StoryBranchNameDelegate>();
 
 		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, branch, commit) => $"story/{id}/{branch.FriendlyName}/{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
@@ -60,12 +63,40 @@ namespace GitStory.Core
 					repo.Config.Get<string>("user.email").Value)
 				, time);
 
+		public static Identity GetCommiterIdentity(this Repository repo)
+			=> new Identity(
+					repo.Config.GetValueOrDefault("gitstory.commiter.name", () => "Git Story"),
+					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value));
+
 		public static Signature GetCommiterSignature(this Repository repo, DateTime time)
 			=> new Signature(
-				new Identity(
-					repo.Config.GetValueOrDefault("gitstory.commiter.name", () => "Git Story"),
-					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value))
-				, time);
+				repo.GetCommiterIdentity(), time);
+
+		public static StoryBranchNameDelegate GetStoryBranchNameFn(this string pattern)
+			=> pattern.null_ws_()
+			? DefaultStoryBranchNameFn
+			: StoryBranchNameFns.GetOrAdd(pattern, p => {
+				var barnchNameScript = CSharpScript.Create<string>($"$\"{p}\""
+					, globalsType: typeof(StoryBranchNameDelegateParameters));
+				barnchNameScript.Compile();
+
+				return (id, branch, commit) =>
+				{
+					var globals = new StoryBranchNameDelegateParameters
+					{
+						id = id,
+						branch = branch,
+						commit = commit
+					};
+					return barnchNameScript.RunAsync(globals).Result.ReturnValue;
+				};
+			});
+
+		public static StoryBranchNameDelegate GetStoryBranchNameFn(this Repository repo)
+		{
+			var namePattern = repo.Config.GetValueOrDefault("gitstory.branchnamepattern", string.Empty);
+			return namePattern.GetStoryBranchNameFn();
+		}
 
 		public static Branch GetStoryBranch(this Repository repo
 			, Branch branch, StoryBranchNameDelegate storyBranchNameFn)
@@ -73,89 +104,91 @@ namespace GitStory.Core
 
 		public static Branch GetStoryBranch(this Repository repo
 			, Branch branch, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
-		{
-			var id = repo.GetUuid();
-			var currentCommit = branch.Commits.First();
+			=> repo.GetStoryBranch(repo.GetUuid(), branch, branch.Tip, storyBranchNameFn, out storyBranchName);
 
-			storyBranchName = storyBranchNameFn(id, branch, currentCommit);
+		public static Branch GetStoryBranch(this Repository repo
+			, Branch branch, Commit commit, StoryBranchNameDelegate storyBranchNameFn)
+			=> repo.GetStoryBranch(branch, commit, storyBranchNameFn, out string storyBranchName);
+
+		public static Branch GetStoryBranch(this Repository repo
+			, Branch branch, Commit commit, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
+			=> repo.GetStoryBranch(repo.GetUuid(), branch, commit, storyBranchNameFn, out storyBranchName);
+
+		public static Branch GetStoryBranch(this Repository repo
+			, string id, Branch branch, Commit commit
+			, StoryBranchNameDelegate storyBranchNameFn, out string storyBranchName)
+		{
+			storyBranchName = storyBranchNameFn(id, branch, commit);
 			var n = storyBranchName;
 			return repo.Branches.Where(b => b.FriendlyName == n).FirstOrDefault();
 		}
 
-		static void SaveStatus(this Repository repo, out Dictionary<string, FileStatus> filesStatus)
-		{
-			filesStatus = new Dictionary<string, FileStatus>();
+		public static Repository RenameStoryBranches(this Repository repo
+			, string oldPattern, string newPattern = null)
+			=> repo.RenameStoryBranches(oldPattern.GetStoryBranchNameFn(), newPattern.GetStoryBranchNameFn());
 
-			foreach (var item in repo.RetrieveStatus(new StatusOptions { IncludeIgnored = false }))
+		public static Repository RenameStoryBranches(this Repository repo
+			, StoryBranchNameDelegate oldBranchNameFn
+			, StoryBranchNameDelegate newBranchNameFn)
+		{
+			var now = DateTime.Now;
+
+			foreach (var commit in repo.Head.Commits)
 			{
-				filesStatus.Add(item.FilePath, item.State);
-			}
-		}
+				var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
+				if (oldStoryBranch != null)
+				{
+					var newStoryBranch = repo.GetStoryBranch(repo.Head, commit, newBranchNameFn, out var newStoryBranchName);
 
-		static void RestoreStatus(this Repository repo, Dictionary<string, FileStatus> filesStatus)
-		{
-			var filesToUnstage = filesStatus
-				.Where(p => !p.Value.HasFlag(FileStatus.ModifiedInIndex))
-				.Select(p => p.Key);
-			if (filesToUnstage.Any())
-			{
-				Commands.Unstage(repo, filesToUnstage);
-			}
-		}
+					if (newStoryBranch != null)
+					{
+						try
+						{
+							var rebase = repo.Rebase.Start(newStoryBranch.Tip, oldStoryBranch.Tip, oldStoryBranch.Tip, repo.GetCommiterIdentity(), new RebaseOptions { });
+							if (rebase.Status != RebaseStatus.Complete)
+							{
 
-		class CaptureStatus : IDisposable
-		{
-			Repository repo;
-			Dictionary<string, FileStatus> filesStatus;
+							}
 
-			public bool IsEmpty => filesStatus.Count == 0;
+							int i = 0;
 
-			public CaptureStatus(Repository repo)
-			{
-				this.repo = repo;
-				repo.SaveStatus(out filesStatus);
-			}
+							/*
+							var result = repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now),
+								new MergeOptions()
+								{
+									FileConflictStrategy = CheckoutFileConflictStrategy.Ours
+								});
+							repo.Branches.Remove(oldStoryBranch);
+							foreach (var c in repo.Index.Conflicts.ToArray())
+							{
+								repo.Index.Add(c.Ours.Path);
+							}
 
-			public void Dispose()
-			{
-				repo.RestoreStatus(filesStatus);
-			}
-		}
+							Commands.Stage(repo, "*");
 
-		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef)
-		{
-			var storyBranch = repo.GetStoryBranch(repo.Head, storyBranchNameFn, out var storyBranchName);
-			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
-
-			headRef = (repo.Head.Reference as SymbolicReference).Target;
-			repo.Refs.UpdateTarget("HEAD", storyBranch.Reference.CanonicalName);
-		}
-
-		static void SwitchToHeadBranch(this Repository repo, Reference headRef)
-		{
-			repo.Refs.UpdateTarget("HEAD", headRef.CanonicalName);
-		}
-
-		class ToStoryBranch : IDisposable
-		{
-			Repository repo;
-			Reference headRef;
-
-			public ToStoryBranch(Repository repo, StoryBranchNameDelegate storyBranchNameFn)
-			{
-				this.repo = repo;
-				repo.SwitchToStoryBranch(storyBranchNameFn, out headRef);
+							repo.Commit("merge"
+								, repo.GetAuthorSignature(now)
+								, repo.GetCommiterSignature(now));
+								*/
+						}
+						catch (Exception e)
+						{
+							int i = 0;
+						}
+					}
+					else
+					{
+						repo.Branches.Rename(oldStoryBranch, newStoryBranchName);
+					}
+				}
 			}
 
-			public void Dispose()
-			{
-				repo.SwitchToHeadBranch(headRef);
-			}
+			return repo;
 		}
 
 		public static Repository Store(this Repository repo)
 			=> repo.Store(
-				storyBranchNameFn: DefaultStoryBranchNameFn,
+				storyBranchNameFn: repo.GetStoryBranchNameFn(),
 				message: DefaultCommitMessage);
 
 		public static Repository Store(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, string message)
@@ -166,20 +199,12 @@ namespace GitStory.Core
 					return repo;
 
 				repo.Submodules
-					.Where(sm => sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
-					.Select(sm => {
-						try
-						{
-							new Repository(sm.Path).Store(storyBranchNameFn, message);
-						}
-						catch (Exception e) { return e; }
-						return null;
-					})
-					//.AggregateExecption((ae, e, iae) => { ae.})
-					.Where(e => e != null)
-					.Count();
+					.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
+					.ForEachSubmodule(sm => {
+						new Repository(sm.Path).Store(storyBranchNameFn, message);
+					});
 
-				using (new ToStoryBranch(repo, storyBranchNameFn))
+				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
 				{
 					Commands.Stage(repo, "*");
 
@@ -198,7 +223,7 @@ namespace GitStory.Core
 		}
 
 		public static Repository Status(this Repository repo)
-			=> repo.Status(storyBranchNameFn: DefaultStoryBranchNameFn);
+			=> repo.Status(storyBranchNameFn: repo.GetStoryBranchNameFn());
 
 		public static Repository Status(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 		{
@@ -207,19 +232,13 @@ namespace GitStory.Core
 				if (st.IsEmpty)
 					return repo;
 
-				foreach (var sm in repo.Submodules)
-				{
-					if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
-						continue;
-
-					try
-					{
+				repo.Submodules
+					.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
+					.ForEachSubmodule(sm => {
 						new Repository(sm.Path).Status(storyBranchNameFn);
-					}
-					catch { }
-				}
+					});
 
-				using (new ToStoryBranch(repo, storyBranchNameFn))
+				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
 				{
 					Commands.Stage(repo, "*");
 
@@ -263,7 +282,7 @@ namespace GitStory.Core
 		}
 
 		public static void Diff(this Repository repo)
-			=> repo.Diff(DefaultStoryBranchNameFn);
+			=> repo.Diff(repo.GetStoryBranchNameFn());
 
 		public static void Diff(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 		{
