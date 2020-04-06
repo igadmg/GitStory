@@ -148,9 +148,17 @@ namespace GitStory.Core
 			return repo;
 		}
 
-		static Repository ForEachSubmodule(this IEnumerable<Submodule> submodules, Action<Submodule> fn)
+		static IEnumerable<Submodule> ForEachSubmodule(this IEnumerable<Submodule> submodules, Action<Submodule> fn)
 		{
-			return repo;
+			submodules.Select(sm => {
+						try { fn(sm); }
+						catch (Exception e) { return e; }
+						return null;
+					})
+					//.AggregateExecption((ae, e, iae) => { ae.})
+					.Where(e => e != null)
+					.Count();
+			return submodules;
 		}
 
 		public static Repository Store(this Repository repo)
@@ -167,7 +175,9 @@ namespace GitStory.Core
 
 				repo.Submodules
 					.Where(sm => sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
-					.For
+					.ForEachSubmodule(sm => {
+						new Repository(sm.Path).Store(storyBranchNameFn, message);
+					});
 
 				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
 				{
