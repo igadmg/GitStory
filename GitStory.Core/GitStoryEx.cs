@@ -173,30 +173,6 @@ namespace GitStory.Core
 			return repo;
 		}
 
-		public class DisposableLock<T> : IDisposable
-		{
-			T v;
-			Action<T> disposeFn;
-
-			public RebaseReferenceGuard(T v_, Action<T> disposeFn_)
-			{
-				v = v_;
-				disposeFn = disposeFn_;
-			}
-
-			public void Dispose()
-			{
-				disposeFn(v);
-			}
-
-			public T Value => v;
-		}
-
-		private static DisposableLock<Branch> LockBranch(Branch head)
-		{
-			throw new NotImplementedException();
-		}
-
 		public static Repository Store(this Repository repo)
 			=> repo.Store(
 				storyBranchNameFn: repo.GetStoryBranchNameFn(),
