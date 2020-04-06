@@ -135,7 +135,7 @@ namespace GitStory.Core
 
 			using (var head = LockBranch(repo.Head))
 			{
-				foreach (var commit in head.Commits)
+				foreach (var commit in ((Branch)head).Commits)
 				{
 					var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
 					if (oldStoryBranch != null)
@@ -171,6 +171,18 @@ namespace GitStory.Core
 			}
 
 			return repo;
+		}
+
+		public class DisposableLock<T> : IDisposable
+		{
+			T v;
+
+			public void Dispose()
+			{
+				throw new NotImplementedException();
+			}
+
+			public T Value => v;
 		}
 
 		private static DisposableLock<Branch> LockBranch(Branch head)
