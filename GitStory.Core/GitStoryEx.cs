@@ -144,11 +144,8 @@ namespace GitStory.Core
 					{
 						try
 						{
-							repo.Submodules.ForEachSubmodule(sm =>
-							{
-								var item = newStoryBranch.Tip.Tree[sm.Path];
-								int f = 0;
-							});
+							repo.Checkout(newStoryBranch.Tip.Tree
+								, repo.Submodules.Select(s => s.Path), null);
 
 							var rebase = repo.Rebase.Start(newStoryBranch.Tip, oldStoryBranch.Tip, oldStoryBranch.Tip, repo.GetCommiterIdentity()
 								, new RebaseOptions {
