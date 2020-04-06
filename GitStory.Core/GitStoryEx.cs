@@ -129,6 +129,8 @@ namespace GitStory.Core
 			, StoryBranchNameDelegate oldBranchNameFn
 			, StoryBranchNameDelegate newBranchNameFn)
 		{
+			var now = DateTime.Now;
+
 			foreach (var commit in repo.Head.Commits)
 			{
 				var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
@@ -138,7 +140,7 @@ namespace GitStory.Core
 
 					if (newStoryBranch != null)
 					{
-						int i = 0;
+						repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now));
 					}
 				}
 			}
