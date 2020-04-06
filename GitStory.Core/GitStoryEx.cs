@@ -133,7 +133,7 @@ namespace GitStory.Core
 		{
 			var now = DateTime.Now;
 
-			using (var head = DisposableLock.Lock(repo.Head, h => Commands.Checkout(h)))
+			using (var head = DisposableLock.Lock(repo.Head, h => Commands.Checkout(repo, h)))
 			{
 				foreach (var commit in head.Value.Commits)
 				{
