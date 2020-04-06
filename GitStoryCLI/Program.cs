@@ -5,9 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
-using SystemEx;
 
 namespace GitStoryCLI
 {
