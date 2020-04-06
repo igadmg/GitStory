@@ -142,12 +142,15 @@ namespace GitStory.Core
 					{
 						using (new CheckoutBranch(repo, newStoryBranch))
 						{
-							repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now));
+							var result = repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now));
 							repo.Branches.Remove(oldStoryBranch);
 
 							foreach (var conflict in repo.Index.Conflicts)
 							{
 								int i = 0;
+								repo.Index.Remove(conflict.Ours.Path);
+								int j = 0;
+								repo.CheckoutPaths(newStoryBranch.CanonicalName, new[] { conflict.Ours.Path });
 							}
 						}
 					}
