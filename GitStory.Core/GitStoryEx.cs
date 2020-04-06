@@ -140,8 +140,10 @@ namespace GitStory.Core
 
 					if (newStoryBranch != null)
 					{
-						using (new CheckoutBranch(repo, newStoryBranch))
+						//using (new CheckoutBranch(repo, newStoryBranch))
 						{
+							repo.Rebase.Start(newStoryBranch, )
+
 							var result = repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now),
 								new MergeOptions()
 								{
