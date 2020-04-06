@@ -144,7 +144,10 @@ namespace GitStory.Core
 					{
 						try
 						{
-							var rebase = repo.Rebase.Start(newStoryBranch.Tip, oldStoryBranch.Tip, oldStoryBranch.Tip, repo.GetCommiterIdentity(), new RebaseOptions { });
+							var rebase = repo.Rebase.Start(newStoryBranch.Tip, oldStoryBranch.Tip, oldStoryBranch.Tip, repo.GetCommiterIdentity()
+								, new RebaseOptions {
+									FileConflictStrategy = CheckoutFileConflictStrategy.Theirs
+								});
 							if (rebase.Status != RebaseStatus.Complete)
 							{
 
