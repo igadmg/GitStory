@@ -176,10 +176,11 @@ namespace GitStory.Core
 		public class DisposableLock<T> : IDisposable
 		{
 			T v;
+			Action<T> disposeFn;
 
 			public void Dispose()
 			{
-				throw new NotImplementedException();
+				disposeFn(v);
 			}
 
 			public T Value => v;
