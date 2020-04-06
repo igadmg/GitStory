@@ -140,7 +140,10 @@ namespace GitStory.Core
 
 					if (newStoryBranch != null)
 					{
-						repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now));
+						using (new CheckoutBranch(repo, newStoryBranch))
+						{
+							repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now));
+						}
 					}
 				}
 			}
