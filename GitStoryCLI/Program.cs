@@ -11,6 +11,7 @@ using SystemEx;
 
 namespace GitStoryCLI
 {
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 	class Program : ConsoleAppBase
 	{
 		static string dir;
@@ -87,4 +88,5 @@ namespace GitStoryCLI
 			repo.Store();
 		}
 	}
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 }
