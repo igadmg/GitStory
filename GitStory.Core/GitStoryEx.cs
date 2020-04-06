@@ -144,6 +144,11 @@ namespace GitStory.Core
 						{
 							repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now));
 							repo.Branches.Remove(oldStoryBranch);
+
+							foreach (var conflict in repo.RetrieveStatus(new StatusOptions { IncludeIgnored = false }))
+							{
+								int i = 0;
+							}
 						}
 					}
 					else
