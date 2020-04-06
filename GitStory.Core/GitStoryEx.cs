@@ -1,4 +1,5 @@
 ﻿using LibGit2Sharp;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace GitStory.Core
 	{
 		public class StoryBranchNameDelegateParameters { public string id; public Branch branch; public Commit commit; }
 		public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
+
+		static Dictionary<string, StoryBranchNameDelegate> StoryBranchNameFns = new Dictionary<string, StoryBranchNameDelegate>();
 
 		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, branch, commit) => $"story/{id}/{branch.FriendlyName}/{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
@@ -66,6 +69,31 @@ namespace GitStory.Core
 					repo.Config.GetValueOrDefault("gitstory.commiter.name", () => "Git Story"),
 					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value))
 				, time);
+
+		public static StoryBranchNameDelegate GetStoryBranchNameFn(this Repository repo)
+		{
+			var namePattern = repo.Config.GetValueOrDefault("gitstory.branch_name_pattern", string.Empty);
+
+			if (namePattern.null_ws_())
+				return DefaultStoryBranchNameFn;
+
+			return StoryBranchNameFns.GetOrAdd(namePattern, pattern => {
+				var barnchNameScript = CSharpScript.Create<string>($"$\"{pattern}\""
+					, globalsType: typeof(StoryBranchNameDelegateParameters));
+				barnchNameScript.Compile();
+
+				return (id, branch, commit) =>
+				{
+					var globals = new StoryBranchNameDelegateParameters
+					{
+						id = id,
+						branch = branch,
+						commit = commit
+					};
+					return barnchNameScript.RunAsync(globals).Result.ReturnValue;
+				};
+			});
+		}
 
 		public static Branch GetStoryBranch(this Repository repo
 			, Branch branch, StoryBranchNameDelegate storyBranchNameFn)
@@ -155,7 +183,7 @@ namespace GitStory.Core
 
 		public static Repository Store(this Repository repo)
 			=> repo.Store(
-				storyBranchNameFn: DefaultStoryBranchNameFn,
+				storyBranchNameFn: repo.GetStoryBranchNameFn(),
 				message: DefaultCommitMessage);
 
 		public static Repository Store(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, string message)
@@ -198,7 +226,7 @@ namespace GitStory.Core
 		}
 
 		public static Repository Status(this Repository repo)
-			=> repo.Status(storyBranchNameFn: DefaultStoryBranchNameFn);
+			=> repo.Status(storyBranchNameFn: repo.GetStoryBranchNameFn());
 
 		public static Repository Status(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 		{
@@ -263,7 +291,7 @@ namespace GitStory.Core
 		}
 
 		public static void Diff(this Repository repo)
-			=> repo.Diff(DefaultStoryBranchNameFn);
+			=> repo.Diff(repo.GetStoryBranchNameFn());
 
 		public static void Diff(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 		{
