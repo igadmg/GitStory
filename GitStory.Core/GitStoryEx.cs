@@ -7,11 +7,11 @@ using SystemEx;
 
 namespace GitStory.Core
 {
+	public class StoryBranchNameDelegateParameters { public string id; public Branch branch; public Commit commit; }
+	public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
+	
 	public static class GitStoryEx
 	{
-		public class StoryBranchNameDelegateParameters { public string id; public Branch branch; public Commit commit; }
-		public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
-
 		static Dictionary<string, StoryBranchNameDelegate> StoryBranchNameFns = new Dictionary<string, StoryBranchNameDelegate>();
 
 		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, branch, commit) => $"story/{id}/{branch.FriendlyName}/{commit.Sha}";
@@ -146,37 +146,6 @@ namespace GitStory.Core
 			}
 
 			return repo;
-		}
-
-		static void SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, out Reference headRef)
-		{
-			var storyBranch = repo.GetStoryBranch(repo.Head, storyBranchNameFn, out var storyBranchName);
-			storyBranch = storyBranch ?? repo.CreateBranch(storyBranchName);
-
-			headRef = (repo.Head.Reference as SymbolicReference).Target;
-			repo.Refs.UpdateTarget("HEAD", storyBranch.Reference.CanonicalName);
-		}
-
-		static void SwitchToHeadBranch(this Repository repo, Reference headRef)
-		{
-			repo.Refs.UpdateTarget("HEAD", headRef.CanonicalName);
-		}
-
-		class ToStoryBranch : IDisposable
-		{
-			Repository repo;
-			Reference headRef;
-
-			public ToStoryBranch(Repository repo, StoryBranchNameDelegate storyBranchNameFn)
-			{
-				this.repo = repo;
-				repo.SwitchToStoryBranch(storyBranchNameFn, out headRef);
-			}
-
-			public void Dispose()
-			{
-				repo.SwitchToHeadBranch(headRef);
-			}
 		}
 
 		public static Repository Store(this Repository repo)
