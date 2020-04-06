@@ -150,7 +150,7 @@ namespace GitStory.Core
 
 		static IEnumerable<Submodule> ForEachSubmodule(this IEnumerable<Submodule> submodules, Action<Submodule> fn)
 		{
-			submodules.Select(sm => {
+			var exceptions = submodules.Select(sm => {
 						try { fn(sm); }
 						catch (Exception e) { return e; }
 						return null;
@@ -174,7 +174,7 @@ namespace GitStory.Core
 					return repo;
 
 				repo.Submodules
-					.Where(sm => sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
+					.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
 					.ForEachSubmodule(sm => {
 						new Repository(sm.Path).Store(storyBranchNameFn, message);
 					});
@@ -207,17 +207,11 @@ namespace GitStory.Core
 				if (st.IsEmpty)
 					return repo;
 
-				foreach (var sm in repo.Submodules)
-				{
-					if (sm.RetrieveStatus() == SubmoduleStatus.Unmodified)
-						continue;
-
-					try
-					{
+				repo.Submodules
+					.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
+					.ForEachSubmodule(sm => {
 						new Repository(sm.Path).Status(storyBranchNameFn);
-					}
-					catch { }
-				}
+					});
 
 				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
 				{
