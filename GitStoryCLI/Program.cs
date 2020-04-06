@@ -1,7 +1,6 @@
 ﻿using ConsoleAppFramework;
 using GitStory.Core;
 using LibGit2Sharp;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
@@ -17,19 +16,6 @@ namespace GitStoryCLI
 
 		static async Task Main(string[] args)
 		{
-			var branchNamePattern = "story/{id}/{branch.FriendlyName}/{commit.Sha}";
-			var barnchNameScript = CSharpScript.Create<string>($"$\"{branchNamePattern}\""
-				, globalsType: typeof(GitStoryEx.StoryBranchNameDelegateParameters));
-			barnchNameScript.Compile();
-
-			GitStoryEx.StoryBranchNameDelegate fn = (id, branch, commit) =>
-			{
-				var globals = new GitStoryEx.StoryBranchNameDelegateParameters {
-					id = id, branch = branch, commit = commit
-				};
-				return barnchNameScript.RunAsync(globals).Result.ReturnValue;
-			};
-
 			dir = Repository.Discover(Directory.GetCurrentDirectory());
 			using (repo = new Repository(dir))
 			{
