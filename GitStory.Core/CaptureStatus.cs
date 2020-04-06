@@ -16,15 +16,15 @@ namespace GitStory.Core
 		public CaptureStatus(Repository repo)
 		{
 			this.repo = repo;
-			repo.SaveStatus(out filesStatus);
+			SaveStatus(repo, out filesStatus);
 		}
 
 		public void Dispose()
 		{
-			repo.RestoreStatus(filesStatus);
+			estoreStatus(repo, filesStatus);
 		}
 
-		static void SaveStatus(this Repository repo, out Dictionary<string, FileStatus> filesStatus)
+		static void SaveStatus(Repository repo, out Dictionary<string, FileStatus> filesStatus)
 		{
 			filesStatus = new Dictionary<string, FileStatus>();
 
@@ -34,7 +34,7 @@ namespace GitStory.Core
 			}
 		}
 
-		static void RestoreStatus(this Repository repo, Dictionary<string, FileStatus> filesStatus)
+		static void RestoreStatus(Repository repo, Dictionary<string, FileStatus> filesStatus)
 		{
 			var filesToUnstage = filesStatus
 				.Where(p => !p.Value.HasFlag(FileStatus.ModifiedInIndex))
