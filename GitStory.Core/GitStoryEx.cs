@@ -149,8 +149,15 @@ namespace GitStory.Core
 							{
 								if (conflict.State == FileStatus.Conflicted)
 								{
-									repo.CheckoutPaths(newStoryBranch.CanonicalName
-										, new string[] { conflict.FilePath }, null);
+									try
+									{
+										repo.CheckoutPaths(newStoryBranch.CanonicalName
+											, new string[] { conflict.FilePath }, null);
+									}
+									catch (Exception e)
+									{
+										int i = 0;
+									}
 								}
 							}
 						}
