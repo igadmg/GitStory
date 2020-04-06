@@ -70,15 +70,11 @@ namespace GitStory.Core
 					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value))
 				, time);
 
-		public static StoryBranchNameDelegate GetStoryBranchNameFn(this Repository repo)
-		{
-			var namePattern = repo.Config.GetValueOrDefault("gitstory.branchnamepattern", string.Empty);
-
-			if (namePattern.null_ws_())
-				return DefaultStoryBranchNameFn;
-
-			return StoryBranchNameFns.GetOrAdd(namePattern, pattern => {
-				var barnchNameScript = CSharpScript.Create<string>($"$\"{pattern}\""
+		public static StoryBranchNameDelegate GetStoryBranchNameFn(this string pattern)
+			=> pattern.null_ws_()
+			? DefaultStoryBranchNameFn
+			: StoryBranchNameFns.GetOrAdd(pattern, p => {
+				var barnchNameScript = CSharpScript.Create<string>($"$\"{p}\""
 					, globalsType: typeof(StoryBranchNameDelegateParameters));
 				barnchNameScript.Compile();
 
@@ -93,6 +89,11 @@ namespace GitStory.Core
 					return barnchNameScript.RunAsync(globals).Result.ReturnValue;
 				};
 			});
+
+		public static StoryBranchNameDelegate GetStoryBranchNameFn(this Repository repo)
+		{
+			var namePattern = repo.Config.GetValueOrDefault("gitstory.branchnamepattern", string.Empty);
+			return namePattern.GetStoryBranchNameFn();
 		}
 
 		public static Branch GetStoryBranch(this Repository repo
@@ -108,6 +109,22 @@ namespace GitStory.Core
 			storyBranchName = storyBranchNameFn(id, branch, currentCommit);
 			var n = storyBranchName;
 			return repo.Branches.Where(b => b.FriendlyName == n).FirstOrDefault();
+		}
+
+		public static Repository RenameStoryBranches(this Repository repo
+			, string oldPattern, string newPattern = null)
+			=> repo.RenameBranches(oldPattern.GetStoryBranchNameFn(), newPattern.GetStoryBranchNameFn());
+
+		public static Repository RenameBranches(this Repository repo
+			, StoryBranchNameDelegate oldBranchNameFn
+			, StoryBranchNameDelegate newBranchNameFn)
+		{
+			foreach (var commit in repo.Head.Commits)
+			{
+
+			}
+
+			return repo;
 		}
 
 		static void SaveStatus(this Repository repo, out Dictionary<string, FileStatus> filesStatus)

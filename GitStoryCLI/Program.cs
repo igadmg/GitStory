@@ -59,6 +59,12 @@ namespace GitStoryCLI
 			repo.ChangeUuid(oldUuid, newUuid);
 		}
 
+		[Command("rename-branches")]
+		public async Task RenameBranches([Option(0)] string oldPattern)
+		{
+			repo.RenameStoryBranches(oldPattern);
+		}
+
 		[Command("diff")]
 		public async Task Diff()
 		{
