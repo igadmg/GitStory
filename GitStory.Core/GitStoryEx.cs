@@ -148,23 +148,6 @@ namespace GitStory.Core
 			return repo;
 		}
 
-		static IEnumerable<Submodule> ForEachSubmodule(this IEnumerable<Submodule> submodules, Action<Submodule> fn)
-		{
-			var exceptions =
-				submodules.Select(sm => {
-					try { fn(sm); }
-					catch (Exception e) { return e; }
-					return null;
-				})
-				.Where(e => e != null)
-				.ToArray();
-
-			if (exceptions.Length != 0)
-				throw new AggregateException(exceptions);
-
-			return submodules;
-		}
-
 		public static Repository Store(this Repository repo)
 			=> repo.Store(
 				storyBranchNameFn: repo.GetStoryBranchNameFn(),
