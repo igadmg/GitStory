@@ -136,14 +136,19 @@ namespace GitStory.Core
 				var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
 				if (oldStoryBranch != null)
 				{
-					var newStoryBranch = repo.GetStoryBranch(repo.Head, commit, newBranchNameFn);
+					var newStoryBranch = repo.GetStoryBranch(repo.Head, commit, newBranchNameFn, out var newStoryBranchName);
 
 					if (newStoryBranch != null)
 					{
 						using (new CheckoutBranch(repo, newStoryBranch))
 						{
 							repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now));
+							repo.Branches.Remove(oldStoryBranch);
 						}
+					}
+					else
+					{
+						repo.Branches.Rename(oldStoryBranch, )
 					}
 				}
 			}
