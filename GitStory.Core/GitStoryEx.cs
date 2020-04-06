@@ -148,6 +148,8 @@ namespace GitStory.Core
 			return repo;
 		}
 
+		static Repository ForEachSubmodule(this Repository repo)
+
 		public static Repository Store(this Repository repo)
 			=> repo.Store(
 				storyBranchNameFn: repo.GetStoryBranchNameFn(),
@@ -174,7 +176,7 @@ namespace GitStory.Core
 					.Where(e => e != null)
 					.Count();
 
-				using (new ToStoryBranch(repo, storyBranchNameFn))
+				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
 				{
 					Commands.Stage(repo, "*");
 
@@ -214,7 +216,7 @@ namespace GitStory.Core
 					catch { }
 				}
 
-				using (new ToStoryBranch(repo, storyBranchNameFn))
+				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
 				{
 					Commands.Stage(repo, "*");
 
