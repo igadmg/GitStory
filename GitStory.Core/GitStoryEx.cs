@@ -148,7 +148,10 @@ namespace GitStory.Core
 			return repo;
 		}
 
-		static Repository ForEachSubmodule(this Repository repo)
+		static Repository ForEachSubmodule(this Repository repo, Action<Submodule> fn)
+		{
+			return repo;
+		}
 
 		public static Repository Store(this Repository repo)
 			=> repo.Store(
