@@ -8,7 +8,7 @@ namespace GitStory.Core
 {
 	public static class LibGit2SharpEx
 	{
-		static IEnumerable<Submodule> ForEachSubmodule(this IEnumerable<Submodule> submodules, Action<Submodule> fn)
+		public static IEnumerable<Submodule> ForEachSubmodule(this IEnumerable<Submodule> submodules, Action<Submodule> fn)
 		{
 			var exceptions =
 				submodules.Select(sm => {
