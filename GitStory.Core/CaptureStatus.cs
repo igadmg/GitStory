@@ -21,7 +21,7 @@ namespace GitStory.Core
 
 		public void Dispose()
 		{
-			estoreStatus(repo, filesStatus);
+			RestoreStatus(repo, filesStatus);
 		}
 
 		static void SaveStatus(Repository repo, out Dictionary<string, FileStatus> filesStatus)
