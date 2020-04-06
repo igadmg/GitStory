@@ -19,8 +19,6 @@ namespace GitStoryCLI
 			dir = Repository.Discover(Directory.GetCurrentDirectory());
 			using (repo = new Repository(dir))
 			{
-				var s = fn(repo.GetUuid(), repo.Head, repo.Head.Tip);
-
 				await Host.CreateDefaultBuilder().RunConsoleAppFrameworkAsync<Program>(args);
 			}
 		}
