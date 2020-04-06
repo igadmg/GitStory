@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="ConsoleAppFramework" Version="2.1.1" />
     <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.306" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="3.5.0" />
   </ItemGroup>
 
   <ItemGroup>
