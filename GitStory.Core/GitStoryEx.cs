@@ -135,37 +135,38 @@ namespace GitStory.Core
 
 			using (var head = DisposableLock.Lock(repo.Head, h => Commands.Checkout(repo, h)))
 			{
-				foreach (var commit in head.Value.Commits)
+				foreach ((var commit, var oldStoryBranch) in head.Value.Commits
+					.Select(c => (commit: c, oldStoryBranch: repo.GetStoryBranch(head, c, oldBranchNameFn)))
+					.Where(p => p.oldStoryBranch != null)
+					.Select(p => {
+						var b = repo.GetStoryBranch(head, p.commit, newBranchNameFn, out var newStoryBranchName);
+						return (p.commit, p.oldStoryBranch, newStoryBranch: b, newStoryBranchName);
+					});
 				{
-					var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
-					if (oldStoryBranch != null)
+					var newStoryBranch = repo.GetStoryBranch(head, commit, newBranchNameFn, out var newStoryBranchName);
+					if (newStoryBranch != null)
 					{
-						var newStoryBranch = repo.GetStoryBranch(repo.Head, commit, newBranchNameFn, out var newStoryBranchName);
-
-						if (newStoryBranch != null)
+						try
 						{
-							try
+							//Commands.Checkout(repo, newStoryBranch);
+							var rebase = repo.Rebase.Start(newStoryBranch, oldStoryBranch, null, repo.GetCommiterIdentity()
+								, new RebaseOptions());
+							if (rebase.Status != RebaseStatus.Complete)
 							{
-								//Commands.Checkout(repo, newStoryBranch);
-								var rebase = repo.Rebase.Start(newStoryBranch, oldStoryBranch, null, repo.GetCommiterIdentity()
-									, new RebaseOptions());
-								if (rebase.Status != RebaseStatus.Complete)
-								{
 
-								}
+							}
 
-								repo.Branches.Remove(oldStoryBranch);
-								int i = 0;
-							}
-							catch (Exception e)
-							{
-								int i = 0;
-							}
+							repo.Branches.Remove(oldStoryBranch);
+							int i = 0;
 						}
-						else
+						catch (Exception e)
 						{
-							repo.Branches.Rename(oldStoryBranch, newStoryBranchName);
+							int i = 0;
 						}
+					}
+					else
+					{
+						repo.Branches.Rename(oldStoryBranch, newStoryBranchName);
 					}
 				}
 			}

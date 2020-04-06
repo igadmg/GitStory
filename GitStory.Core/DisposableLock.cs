@@ -29,5 +29,6 @@ namespace GitStory.Core
 		}
 
 		public T Value => v;
+		public static implicit operator T(DisposableLock<T> dl) => dl.v;
 	}
 }
