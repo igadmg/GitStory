@@ -147,13 +147,7 @@ namespace GitStory.Core
 								{
 									FileConflictStrategy = CheckoutFileConflictStrategy.Ours
 								});
-							foreach (var conflict in repo.Index.Conflicts)
-							{
-								int i = 0;
-								repo.Index.Remove(conflict.Ours.Path);
-								int j = 0;
-								repo.CheckoutPaths(newStoryBranch.CanonicalName, new[] { conflict.Ours.Path });
-							}
+							repo.Branches.Remove(oldStoryBranch);
 						}
 					}
 					else
