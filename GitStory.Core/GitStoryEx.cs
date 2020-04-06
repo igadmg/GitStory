@@ -63,12 +63,14 @@ namespace GitStory.Core
 					repo.Config.Get<string>("user.email").Value)
 				, time);
 
+		public static Identity GetCommiterIdentity(this Repository repo)
+			=> new Identity(
+					repo.Config.GetValueOrDefault("gitstory.commiter.name", () => "Git Story"),
+					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value));
+
 		public static Signature GetCommiterSignature(this Repository repo, DateTime time)
 			=> new Signature(
-				new Identity(
-					repo.Config.GetValueOrDefault("gitstory.commiter.name", () => "Git Story"),
-					repo.Config.GetValueOrDefault("gitstory.commiter.email", () => repo.Config.Get<string>("user.email").Value))
-				, time);
+				repo.GetCommiterIdentity(), time);
 
 		public static StoryBranchNameDelegate GetStoryBranchNameFn(this string pattern)
 			=> pattern.null_ws_()
@@ -142,7 +144,7 @@ namespace GitStory.Core
 					{
 						//using (new CheckoutBranch(repo, newStoryBranch))
 						{
-							repo.Rebase.Start(newStoryBranch, )
+							repo.Rebase.Start(newStoryBranch.Tip, commit, oldStoryBranch.Tip, repo.GetCommiterSignature)
 
 							var result = repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now),
 								new MergeOptions()
