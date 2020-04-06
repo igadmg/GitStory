@@ -131,7 +131,11 @@ namespace GitStory.Core
 		{
 			foreach (var commit in repo.Head.Commits)
 			{
-				repo.GetStoryBranch(repo.Head)
+				var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
+				if (oldStoryBranch != null)
+				{
+					var newStoryBranch = repo.GetStoryBranch(repo.Head, commit, newBranchNameFn);
+				}
 			}
 
 			return repo;
