@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using SystemEx;
 
@@ -191,7 +192,7 @@ namespace GitStory.Core
 				repo.Submodules
 					.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
 					.ForEachSubmodule(sm => {
-						new Repository(sm.Path).Store(storyBranchNameFn, message);
+						new Repository(Path.Combine(repo.Info.WorkingDirectory, sm.Path)).Store(storyBranchNameFn, message);
 					});
 
 				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
@@ -225,7 +226,7 @@ namespace GitStory.Core
 				repo.Submodules
 					.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
 					.ForEachSubmodule(sm => {
-						new Repository(sm.Path).Status(storyBranchNameFn);
+						new Repository(Path.Combine(repo.Info.WorkingDirectory, sm.Path)).Status(storyBranchNameFn);
 					});
 
 				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
