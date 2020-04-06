@@ -133,60 +133,49 @@ namespace GitStory.Core
 		{
 			var now = DateTime.Now;
 
-			var head = repo.Head;
-			foreach (var commit in head.Commits)
+			using (var head = LockBranch(repo.Head))
 			{
-				var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
-				if (oldStoryBranch != null)
+				foreach (var commit in head.Commits)
 				{
-					var newStoryBranch = repo.GetStoryBranch(repo.Head, commit, newBranchNameFn, out var newStoryBranchName);
-
-					if (newStoryBranch != null)
+					var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
+					if (oldStoryBranch != null)
 					{
-						try
+						var newStoryBranch = repo.GetStoryBranch(repo.Head, commit, newBranchNameFn, out var newStoryBranchName);
+
+						if (newStoryBranch != null)
 						{
-							//Commands.Checkout(repo, newStoryBranch);
-							var rebase = repo.Rebase.Start(newStoryBranch, oldStoryBranch, null, repo.GetCommiterIdentity()
-								, new RebaseOptions());
-							if (rebase.Status != RebaseStatus.Complete)
+							try
 							{
-
-							}
-
-							int i = 0;
-
-							/*
-							var result = repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now),
-								new MergeOptions()
+								//Commands.Checkout(repo, newStoryBranch);
+								var rebase = repo.Rebase.Start(newStoryBranch, oldStoryBranch, null, repo.GetCommiterIdentity()
+									, new RebaseOptions());
+								if (rebase.Status != RebaseStatus.Complete)
 								{
-									FileConflictStrategy = CheckoutFileConflictStrategy.Ours
-								});
-							repo.Branches.Remove(oldStoryBranch);
-							foreach (var c in repo.Index.Conflicts.ToArray())
-							{
-								repo.Index.Add(c.Ours.Path);
+
+								}
+
+								repo.Branches.Remove(oldStoryBranch);
+								int i = 0;
 							}
-
-							Commands.Stage(repo, "*");
-
-							repo.Commit("merge"
-								, repo.GetAuthorSignature(now)
-								, repo.GetCommiterSignature(now));
-								*/
+							catch (Exception e)
+							{
+								int i = 0;
+							}
 						}
-						catch (Exception e)
+						else
 						{
-							int i = 0;
+							repo.Branches.Rename(oldStoryBranch, newStoryBranchName);
 						}
-					}
-					else
-					{
-						repo.Branches.Rename(oldStoryBranch, newStoryBranchName);
 					}
 				}
 			}
 
 			return repo;
+		}
+
+		private static  LockBranch(Branch head)
+		{
+			throw new NotImplementedException();
 		}
 
 		public static Repository Store(this Repository repo)
