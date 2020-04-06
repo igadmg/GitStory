@@ -133,43 +133,32 @@ namespace GitStory.Core
 		{
 			var now = DateTime.Now;
 
-			foreach (var commit in repo.Head.Commits)
+			using (var head = DisposableLock.Lock(repo.Head, h => {
+				Commands.Checkout(repo, h);
+				repo.Submodules.UpdateAll(new SubmoduleUpdateOptions());
+			}))
 			{
-				var oldStoryBranch = repo.GetStoryBranch(repo.Head, commit, oldBranchNameFn);
-				if (oldStoryBranch != null)
+				foreach (var (commit, oldStoryBranch, newStoryBranch, newStoryBranchName) in head.Value.Commits
+					.Select(c => (commit: c, oldStoryBranch: repo.GetStoryBranch(head, c, oldBranchNameFn)))
+					.Where(p => p.oldStoryBranch != null)
+					.Select(p => {
+						var b = repo.GetStoryBranch(head, p.commit, newBranchNameFn, out var newStoryBranchName);
+						return (p.commit, p.oldStoryBranch, newStoryBranch: b, newStoryBranchName);
+					}))
 				{
-					var newStoryBranch = repo.GetStoryBranch(repo.Head, commit, newBranchNameFn, out var newStoryBranchName);
-
 					if (newStoryBranch != null)
 					{
 						try
 						{
-							var rebase = repo.Rebase.Start(newStoryBranch.Tip, oldStoryBranch.Tip, oldStoryBranch.Tip, repo.GetCommiterIdentity(), new RebaseOptions { });
+							//Commands.Checkout(repo, newStoryBranch);
+							var rebase = repo.Rebase.Start(newStoryBranch, oldStoryBranch, null, repo.GetCommiterIdentity()
+								, new RebaseOptions());
 							if (rebase.Status != RebaseStatus.Complete)
 							{
 
 							}
 
-							int i = 0;
-
-							/*
-							var result = repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now),
-								new MergeOptions()
-								{
-									FileConflictStrategy = CheckoutFileConflictStrategy.Ours
-								});
 							repo.Branches.Remove(oldStoryBranch);
-							foreach (var c in repo.Index.Conflicts.ToArray())
-							{
-								repo.Index.Add(c.Ours.Path);
-							}
-
-							Commands.Stage(repo, "*");
-
-							repo.Commit("merge"
-								, repo.GetAuthorSignature(now)
-								, repo.GetCommiterSignature(now));
-								*/
 						}
 						catch (Exception e)
 						{
@@ -182,6 +171,7 @@ namespace GitStory.Core
 					}
 				}
 			}
+			
 
 			return repo;
 		}
