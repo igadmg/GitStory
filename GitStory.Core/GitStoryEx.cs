@@ -72,7 +72,7 @@ namespace GitStory.Core
 
 		public static StoryBranchNameDelegate GetStoryBranchNameFn(this Repository repo)
 		{
-			var namePattern = repo.Config.GetValueOrDefault("gitstory.branch_name_pattern", string.Empty);
+			var namePattern = repo.Config.GetValueOrDefault("gitstory.branchnamepattern", string.Empty);
 
 			if (namePattern.null_ws_())
 				return DefaultStoryBranchNameFn;
