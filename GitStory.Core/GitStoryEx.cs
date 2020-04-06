@@ -144,6 +144,7 @@ namespace GitStory.Core
 					{
 						try
 						{
+							Commands.Checkout(repo, newStoryBranch);
 							var rebase = repo.Rebase.Start(newStoryBranch.Tip, oldStoryBranch.Tip, oldStoryBranch.Tip, repo.GetCommiterIdentity()
 								, new RebaseOptions {
 									FileConflictStrategy = CheckoutFileConflictStrategy.Ours
