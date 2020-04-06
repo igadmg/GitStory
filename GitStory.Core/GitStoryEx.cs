@@ -178,6 +178,12 @@ namespace GitStory.Core
 			T v;
 			Action<T> disposeFn;
 
+			public RebaseReferenceGuard(T v_, Action<T> disposeFn_)
+			{
+				v = v_;
+				disposeFn = disposeFn_;
+			}
+
 			public void Dispose()
 			{
 				disposeFn(v);
