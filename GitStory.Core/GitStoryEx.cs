@@ -148,7 +148,7 @@ namespace GitStory.Core
 					}
 					else
 					{
-						repo.Branches.Rename(oldStoryBranch, )
+						repo.Branches.Rename(oldStoryBranch, newStoryBranchName);
 					}
 				}
 			}
