@@ -113,9 +113,9 @@ namespace GitStory.Core
 
 		public static Repository RenameStoryBranches(this Repository repo
 			, string oldPattern, string newPattern = null)
-			=> repo.RenameBranches(oldPattern.GetStoryBranchNameFn(), newPattern.GetStoryBranchNameFn());
+			=> repo.RenameStoryBranches(oldPattern.GetStoryBranchNameFn(), newPattern.GetStoryBranchNameFn());
 
-		public static Repository RenameBranches(this Repository repo
+		public static Repository RenameStoryBranches(this Repository repo
 			, StoryBranchNameDelegate oldBranchNameFn
 			, StoryBranchNameDelegate newBranchNameFn)
 		{
