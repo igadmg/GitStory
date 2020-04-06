@@ -133,7 +133,10 @@ namespace GitStory.Core
 		{
 			var now = DateTime.Now;
 
-			using (var head = DisposableLock.Lock(repo.Head, h => Commands.Checkout(repo, h)))
+			using (var head = DisposableLock.Lock(repo.Head, h => {
+				Commands.Checkout(repo, h);
+				repo.Submodules.UpdateAll(new SubmoduleUpdateOptions());
+			}))
 			{
 				foreach (var (commit, oldStoryBranch, newStoryBranch, newStoryBranchName) in head.Value.Commits
 					.Select(c => (commit: c, oldStoryBranch: repo.GetStoryBranch(head, c, oldBranchNameFn)))
@@ -168,6 +171,7 @@ namespace GitStory.Core
 					}
 				}
 			}
+			
 
 			return repo;
 		}
