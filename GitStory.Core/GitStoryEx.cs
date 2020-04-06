@@ -173,7 +173,7 @@ namespace GitStory.Core
 			return repo;
 		}
 
-		private static  LockBranch(Branch head)
+		private static DisposableLock<Branch> LockBranch(Branch head)
 		{
 			throw new NotImplementedException();
 		}
