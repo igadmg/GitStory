@@ -145,7 +145,7 @@ namespace GitStory.Core
 						try
 						{
 							repo.Checkout(newStoryBranch.Tip.Tree
-								, repo.Submodules.Select(s => s.Path), null);
+								, repo.Submodules.Select(s => s.Path), new CheckoutOptions());
 
 							var rebase = repo.Rebase.Start(newStoryBranch.Tip, oldStoryBranch.Tip, oldStoryBranch.Tip, repo.GetCommiterIdentity()
 								, new RebaseOptions {
