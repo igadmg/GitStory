@@ -144,8 +144,15 @@ namespace GitStory.Core
 					{
 						//using (new CheckoutBranch(repo, newStoryBranch))
 						{
-							repo.Rebase.Start(newStoryBranch.Tip, commit, oldStoryBranch.Tip, repo.GetCommiterIdentity(), new RebaseOptions { });
+							var rebase = repo.Rebase.Start(newStoryBranch.Tip, commit, oldStoryBranch.Tip, repo.GetCommiterIdentity(), new RebaseOptions { });
+							if (rebase.Status != RebaseStatus.Complete)
+							{
 
+							}
+
+							int i = 0;
+
+							/*
 							var result = repo.Merge(oldStoryBranch, repo.GetCommiterSignature(now),
 								new MergeOptions()
 								{
@@ -162,6 +169,7 @@ namespace GitStory.Core
 							repo.Commit("merge"
 								, repo.GetAuthorSignature(now)
 								, repo.GetCommiterSignature(now));
+								*/
 						}
 					}
 					else
