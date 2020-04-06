@@ -135,15 +135,14 @@ namespace GitStory.Core
 
 			using (var head = DisposableLock.Lock(repo.Head, h => Commands.Checkout(repo, h)))
 			{
-				foreach ((var commit, var oldStoryBranch) in head.Value.Commits
+				foreach (var (commit, oldStoryBranch, newStoryBranch, newStoryBranchName) in head.Value.Commits
 					.Select(c => (commit: c, oldStoryBranch: repo.GetStoryBranch(head, c, oldBranchNameFn)))
 					.Where(p => p.oldStoryBranch != null)
 					.Select(p => {
 						var b = repo.GetStoryBranch(head, p.commit, newBranchNameFn, out var newStoryBranchName);
 						return (p.commit, p.oldStoryBranch, newStoryBranch: b, newStoryBranchName);
-					});
+					})
 				{
-					var newStoryBranch = repo.GetStoryBranch(head, commit, newBranchNameFn, out var newStoryBranchName);
 					if (newStoryBranch != null)
 					{
 						try
@@ -157,7 +156,6 @@ namespace GitStory.Core
 							}
 
 							repo.Branches.Remove(oldStoryBranch);
-							int i = 0;
 						}
 						catch (Exception e)
 						{
