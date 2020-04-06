@@ -153,7 +153,6 @@ namespace GitStory.Core
 								repo.Index.Add(c.Ours.Path);
 							}
 
-							var now = DateTime.Now;
 							repo.Commit("merge"
 								, repo.GetAuthorSignature(now)
 								, repo.GetCommiterSignature(now));
