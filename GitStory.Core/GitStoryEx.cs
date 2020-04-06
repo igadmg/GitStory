@@ -144,6 +144,12 @@ namespace GitStory.Core
 					{
 						try
 						{
+							repo.Submodules.ForEachSubmodule(sm =>
+							{
+								var i = newStoryBranch.Tip.Tree[sm.Path];
+								int f = 0;
+							});
+
 							var rebase = repo.Rebase.Start(newStoryBranch.Tip, oldStoryBranch.Tip, oldStoryBranch.Tip, repo.GetCommiterIdentity()
 								, new RebaseOptions {
 									FileConflictStrategy = CheckoutFileConflictStrategy.Ours
