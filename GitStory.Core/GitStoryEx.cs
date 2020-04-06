@@ -142,7 +142,7 @@ namespace GitStory.Core
 
 					if (newStoryBranch != null)
 					{
-						//using (new CheckoutBranch(repo, newStoryBranch))
+						try
 						{
 							var rebase = repo.Rebase.Start(newStoryBranch.Tip, oldStoryBranch.Tip, oldStoryBranch.Tip, repo.GetCommiterIdentity(), new RebaseOptions { });
 							if (rebase.Status != RebaseStatus.Complete)
@@ -170,6 +170,10 @@ namespace GitStory.Core
 								, repo.GetAuthorSignature(now)
 								, repo.GetCommiterSignature(now));
 								*/
+						}
+						catch (Exception e)
+						{
+							int i = 0;
 						}
 					}
 					else
