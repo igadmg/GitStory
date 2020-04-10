@@ -2,8 +2,7 @@
   "profiles": {
     "GitStoryCLI": {
       "commandName": "Project",
-      "commandLineArgs": "rename-branches story/bbe12f1a101e416b9f8ebf93af04a8c8/{branch.FriendlyName}_{commit.Sha}",
-      "workingDirectory": "D:\\workspace\\VsRepos\\GitStoryTest"
+      "workingDirectory": "D:\\workspace\\Planar"
     }
   }
 }

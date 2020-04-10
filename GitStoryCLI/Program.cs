@@ -65,9 +65,13 @@ namespace GitStoryCLI
 			repo.Diff();
 		}
 
-		public void Run()
+		public async Task Run()
 		{
-			repo.Store();
+			try
+			{
+				repo.Store();
+			}
+			catch { }
 		}
 	}
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously

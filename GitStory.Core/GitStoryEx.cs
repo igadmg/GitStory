@@ -184,29 +184,31 @@ namespace GitStory.Core
 
 		public static Repository Store(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, string message)
 		{
+			using (var aes = new AggregateExceptionScope())
 			using (var st = new CaptureStatus(repo))
 			{
 				if (st.IsEmpty)
 					return repo;
 
-				repo.Submodules
-					.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
-					.ForEachSubmodule(sm => {
-						new Repository(Path.Combine(repo.Info.WorkingDirectory, sm.Path)).Store(storyBranchNameFn, message);
-					});
+				aes.Execute(() => {
+					repo.Submodules
+						.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
+						.Execute(sm =>
+						{
+							new Repository(Path.Combine(repo.Info.WorkingDirectory, sm.Path)).Store(storyBranchNameFn, message);
+						});
+				});
 
 				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
 				{
 					Commands.Stage(repo, "*");
 
-					try
-					{
+					aes.Execute(() => {
 						var now = DateTime.Now;
 						var author = repo.GetAuthorSignature(now);
 						var commiter = repo.GetCommiterSignature(now);
 						repo.Commit(message, author, commiter);
-					}
-					catch { }
+					});
 				}
 			}
 
@@ -218,16 +220,20 @@ namespace GitStory.Core
 
 		public static Repository Status(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 		{
+			using (var aes = new AggregateExceptionScope())
 			using (var st = new CaptureStatus(repo))
 			{
 				if (st.IsEmpty)
 					return repo;
 
-				repo.Submodules
-					.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
-					.ForEachSubmodule(sm => {
-						new Repository(Path.Combine(repo.Info.WorkingDirectory, sm.Path)).Status(storyBranchNameFn);
-					});
+				aes.Execute(() => {
+					repo.Submodules
+						.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
+						.Execute(sm =>
+						{
+							new Repository(Path.Combine(repo.Info.WorkingDirectory, sm.Path)).Status(storyBranchNameFn);
+						});
+				});
 
 				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
 				{
