@@ -89,7 +89,11 @@ namespace GitStoryVSIX
 				rdte = new RunningDocTableEvents(this,
 					OnAfterSaveFn: () => {
 						print("Saving Story...");
-						repo?.Store();
+						try
+						{
+							repo?.Store();
+						}
+						catch { }
 					});
 			}
 			catch
