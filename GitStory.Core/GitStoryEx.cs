@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using SystemEx;
 
 namespace GitStory.Core
@@ -15,7 +16,7 @@ namespace GitStory.Core
 	{
 		static Dictionary<string, StoryBranchNameDelegate> StoryBranchNameFns = new Dictionary<string, StoryBranchNameDelegate>();
 
-		public static StoryBranchNameDelegate DefaultStoryBranchNameFn = (id, branch, commit) => $"story/{id}/{branch.FriendlyName}/{commit.Sha}";
+		public static string DefaultStoryBranchNamePattern = "story/{id}/{branch.FriendlyName}/{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
 		public static string GenerateUuid(this Repository repo)
@@ -74,9 +75,7 @@ namespace GitStory.Core
 				repo.GetCommiterIdentity(), time);
 
 		public static StoryBranchNameDelegate GetStoryBranchNameFn(this string pattern)
-			=> pattern.null_ws_()
-			? DefaultStoryBranchNameFn
-			: StoryBranchNameFns.GetOrAdd(pattern, p => {
+			=> StoryBranchNameFns.GetOrAdd(pattern, p => {
 				var barnchNameScript = CSharpScript.Create<string>($"$\"{p}\""
 					, globalsType: typeof(StoryBranchNameDelegateParameters));
 				barnchNameScript.Compile();
@@ -93,11 +92,11 @@ namespace GitStory.Core
 				};
 			});
 
+		public static string GetStoryBranchNamePattern(this Repository repo)
+			=> repo.Config.GetValueOrDefault("gitstory.branchnamepattern", DefaultStoryBranchNamePattern);
+
 		public static StoryBranchNameDelegate GetStoryBranchNameFn(this Repository repo)
-		{
-			var namePattern = repo.Config.GetValueOrDefault("gitstory.branchnamepattern", string.Empty);
-			return namePattern.GetStoryBranchNameFn();
-		}
+			=> repo.GetStoryBranchNamePattern().GetStoryBranchNameFn();
 
 		public static Branch GetStoryBranch(this Repository repo
 			, Branch branch, StoryBranchNameDelegate storyBranchNameFn)
@@ -254,20 +253,31 @@ namespace GitStory.Core
 		}
 
 		public static void Fix(this Repository repo)
+			=> repo.Fix(repo.GetStoryBranchNamePattern());
+
+		public static void Fix(this Repository repo, string StoryBranchNamePattern)
 		{
 			var diaryBranch = repo.Head;
 
-			var headBranchName = diaryBranch.CanonicalName.CutEnd('_').CutEnd('_');
-			var headBranch = repo.Branches.Where(b => b.CanonicalName == headBranchName).FirstOrDefault();
+			List<string> groupNames = new List<string>();
+			Regex r = new Regex($"^{StoryBranchNamePattern.format(p => { groupNames.Add(p); return $"(.+?)"; })}$");
+			var m = r.Matches(diaryBranch.FriendlyName);
 
-			repo.Refs.UpdateTarget("HEAD", headBranch.CanonicalName);
+			if (m.Count > 0)
+			{
+				// TODO: not tested, never was used.
+				var headBranchName = m[0].Groups[groupNames.IndexOf("branch.FriendlyName") + 1].Value;
+				var headBranch = repo.Branches.Where(b => b.FriendlyName == headBranchName).FirstOrDefault();
+
+				repo.Refs.UpdateTarget("HEAD", headBranch.CanonicalName);
+			}
 		}
 
 		private static IEnumerable<(Commit oldCommit, Commit newCommit)>
 			EnumCommitPairsUntil(this ICommitLog log, Commit endCommit)
 		{
 			Commit newCommit = null;
-			foreach (var oldCommit in log.TakeWhile(c => c.Sha != endCommit.Sha))
+			foreach (var oldCommit in log.TakeWhileAndLast((c) => c.Sha != endCommit.Sha))
 			{
 				if (newCommit != null)
 				{
@@ -289,9 +299,9 @@ namespace GitStory.Core
 
 			Dictionary<string, SourceHeatmap> heatmaps = new Dictionary<string, SourceHeatmap>();
 
-			foreach (var p in branch.Commits.EnumCommitPairsUntil(repo.Head.Tip))
+			foreach ((var oldCommit, var newCommit) in branch.Commits.EnumCommitPairsUntil(repo.Head.Tip))
 			{
-				var diff = repo.Diff.Compare<Patch>(p.oldCommit.Tree, p.newCommit.Tree);
+				var diff = repo.Diff.Compare<Patch>(oldCommit.Tree, newCommit.Tree);
 
 				foreach (var change in diff)
 				{
