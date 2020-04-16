@@ -32,7 +32,11 @@ namespace GitStoryCLI
 		[Command("status")]
 		public async Task Status()
 		{
-			repo.Status();
+			try
+			{
+				repo.Status();
+			}
+			catch { }
 		}
 
 		[Command("get-uuid")]

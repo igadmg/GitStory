@@ -2,7 +2,7 @@
   "profiles": {
     "GitStoryCLI": {
       "commandName": "Project",
-      "commandLineArgs": "diff",
+      "commandLineArgs": "status",
       "workingDirectory": "D:\\workspace\\Planar"
     }
   }

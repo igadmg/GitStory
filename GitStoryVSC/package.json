@@ -2,7 +2,7 @@
 	"name": "gitstoryvsc",
 	"displayName": "GitStoryVSC",
 	"description": "Git Story - save all your changes to git",
-	"version": "1.2.8",
+	"version": "1.2.9",
 	"publisher": "yatagarasu25",
 	"repository": "https://github.com/yatagarasu25/GitStory",
 	"engines": {
