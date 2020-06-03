@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GitStoryCLI", "GitStoryCLI\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibGit2Sharp", "libgit2sharp\LibGit2Sharp\LibGit2Sharp.csproj", "{4F8927BB-3E2B-44D3-B8C6-93147CC2B565}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSIXEx", "VSIXEx\VSIXEx.csproj", "{6BC9FD6A-940B-4106-85FB-7CCDA4C9D6B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSIXEx.Designer", "VSIXEx.Designer\VSIXEx.Designer.csproj", "{38F16DFF-4632-41AC-872D-6D538219D569}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{4F8927BB-3E2B-44D3-B8C6-93147CC2B565}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F8927BB-3E2B-44D3-B8C6-93147CC2B565}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F8927BB-3E2B-44D3-B8C6-93147CC2B565}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BC9FD6A-940B-4106-85FB-7CCDA4C9D6B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BC9FD6A-940B-4106-85FB-7CCDA4C9D6B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BC9FD6A-940B-4106-85FB-7CCDA4C9D6B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BC9FD6A-940B-4106-85FB-7CCDA4C9D6B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38F16DFF-4632-41AC-872D-6D538219D569}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38F16DFF-4632-41AC-872D-6D538219D569}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38F16DFF-4632-41AC-872D-6D538219D569}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38F16DFF-4632-41AC-872D-6D538219D569}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

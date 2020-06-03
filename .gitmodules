@@ -4,3 +4,9 @@
 [submodule "libgit2sharp"]
 	path = libgit2sharp
 	url = git@github.com:yatagarasu25/libgit2sharp.git
+[submodule "VSIXEx"]
+	path = VSIXEx
+	url = git@github.com:yatagarasu25/VSIXEx.git
+[submodule "VSIXEx.Designer"]
+	path = VSIXEx.Designer
+	url = git@github.com:yatagarasu25/VSIXEx.Designer.git

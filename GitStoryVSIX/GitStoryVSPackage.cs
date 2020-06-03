@@ -1,13 +1,10 @@
-﻿using EnvDTE80;
-using GitStory.Core;
-using LibGit2Sharp;
-using Microsoft.VisualStudio.Shell;
+﻿using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using VSIXEx.Events;
 using Task = System.Threading.Tasks.Task;
 
 namespace GitStoryVSIX
@@ -40,9 +37,8 @@ namespace GitStoryVSIX
 		/// GitsVSPackage GUID string.
 		/// </summary>
 		public const string PackageGuidString = "1ca85a6f-8929-4d41-adcf-8bbafbbb6740";
-		private DTE2 dte;
-		private RunningDocTableEvents rdte;
-		public Repository repo;
+		private SolutionWatcher sw;
+		private VsSolutionEvents solutionEvents;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="GitStoryVSPackage"/> class.
@@ -70,40 +66,13 @@ namespace GitStoryVSIX
 			// Do any initialization that requires the UI thread after switching to the UI thread.
 			await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-			try
-			{
-				dte = GetGlobalService(typeof(SDTE)) as DTE2;
-				var statusBar = await GetServiceAsync(typeof(SVsStatusbar)) as IVsStatusbar;
-
-				Action<string> print = str => {
-					statusBar.IsFrozen(out int frozen);
-					bool unlocked = frozen == 0;
-					if (unlocked)
-					{
-						statusBar.SetText(str);
-					}
-				};
-
-				var solutionDir = Path.GetDirectoryName(dte.Solution.FileName);
-				repo = new Repository(solutionDir);
-				rdte = new RunningDocTableEvents(this,
-					OnAfterSaveFn: () => {
-						print("Saving Story...");
-						try
-						{
-							repo?.Store();
-						}
-						catch { }
-					});
-			}
-			catch
-			{
-				rdte?.Dispose();
-				rdte = null;
-
-				repo?.Dispose();
-				repo = null;
-			}
+			sw = new SolutionWatcher(this);
+			solutionEvents = await this.SubscribeVsSolutionEventsAsync(
+				OnAfterOpenSolution: fNewSolution =>
+				{
+					sw?.Dispose();
+					sw = new SolutionWatcher(this);
+				});
 		}
 
 		protected override void Dispose(bool disposing)
@@ -112,8 +81,8 @@ namespace GitStoryVSIX
 
 			if (disposing)
 			{
-				rdte?.Dispose();
-				repo?.Dispose();
+				sw?.Dispose();
+				solutionEvents?.Dispose();
 			}
 		}
 

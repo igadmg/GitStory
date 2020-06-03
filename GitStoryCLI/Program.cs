@@ -23,6 +23,18 @@ namespace GitStoryCLI
 			}
 		}
 
+		[Command("enable")]
+		public async Task Enable()
+		{
+			repo.SetEnabled(true);
+		}
+
+		[Command("disable")]
+		public async Task Disable()
+		{
+			repo.SetEnabled(true);
+		}
+
 		[Command("fix")]
 		public async Task Fix()
 		{

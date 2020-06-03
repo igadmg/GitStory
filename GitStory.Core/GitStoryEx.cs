@@ -19,6 +19,18 @@ namespace GitStory.Core
 		public static string DefaultStoryBranchNamePattern = "story/{id}/{branch.FriendlyName}/{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
 
+		public static bool GetEnabled(this Repository repo)
+		{
+			return repo.Config.Get<bool>("gitstory.enabled")?.Value ?? false;
+		}
+
+		public static Repository SetEnabled(this Repository repo, bool enabled)
+		{
+			repo.Config.Set("gitstory.enabled", enabled);
+
+			return repo;
+		}
+
 		public static string GenerateUuid(this Repository repo)
 		{
 			var author = repo.GetAuthorSignature(DateTime.Now);
@@ -183,6 +195,9 @@ namespace GitStory.Core
 
 		public static Repository Store(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, string message)
 		{
+			if (!repo.GetEnabled())
+				return repo;
+
 			using (var aes = new AggregateExceptionScope())
 			using (var st = new CaptureStatus(repo))
 			{
