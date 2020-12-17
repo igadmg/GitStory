@@ -25,7 +25,7 @@ namespace GitStory.Core
 			LastLine = last;
 		}
 	}
-
+#if false
 	public static class LineRangeEx
 	{
 		public static LineRange AsLineRange(this ContentChangeLine line)
@@ -72,6 +72,7 @@ namespace GitStory.Core
 			return list;
 		}
 	}
+#endif
 
 	public class SourceHeatmap
 	{
@@ -87,10 +88,10 @@ namespace GitStory.Core
 		{
 			List<LineRange> patch = new List<LineRange>();
 
-			foreach (var l in changes)
-			{
-				
-			}
+			//foreach (var l in changes)
+			//{
+			//	
+			//}
 		}
 	}
 }
