@@ -1,6 +1,10 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">  
 
   <PropertyGroup>
+    <Version>1.2.13</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <IntermediateOutputPath>$(SolutionDir)obj\$(Configuration)\$(MSBuildProjectName)</IntermediateOutputPath>
     <OutputPath>$(SolutionDir)bin\$(Configuration)\$(MSBuildProjectName)</OutputPath>
   </PropertyGroup>

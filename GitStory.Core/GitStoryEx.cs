@@ -4,7 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemEx;
 
 namespace GitStory.Core
@@ -18,6 +21,56 @@ namespace GitStory.Core
 
 		public static string DefaultStoryBranchNamePattern = "story/{id}/{branch.FriendlyName}/{commit.Sha}";
 		public static string DefaultCommitMessage = "update";
+
+		public static string ToMD5(this string str, string format = "x2")
+		{
+			var hashBuilder = new System.Text.StringBuilder();
+			using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+			{
+				foreach (byte b in md5.ComputeHash(System.Text.Encoding.ASCII.GetBytes(str)))
+				{
+					hashBuilder.Append(b.ToString(format, System.Globalization.CultureInfo.InvariantCulture));
+				}
+			}
+
+			return hashBuilder.ToString();
+		}
+
+		public static string GetInternalDataPath(this Repository repo)
+		{
+			var path = Path.Combine(repo.Info.Path, ".git-story");
+			if (!Directory.Exists(path))
+				Directory.CreateDirectory(path);
+
+			return path;
+		}
+
+		public static Assembly GenerateBranchNameFnAssembly(this string path, string pattern)
+		{
+			var script = CSharpScript.Create<string>($"$\"{pattern}\""
+					, globalsType: typeof(StoryBranchNameDelegateParameters));
+			script.Compile();
+			var compilation = script.GetCompilation();
+
+			using (var ilstream = File.Create(path))
+			{
+				compilation.Emit(ilstream);
+			}
+
+			var entryPoint = compilation.GetEntryPoint(CancellationToken.None);
+
+			return Assembly.Load(File.ReadAllBytes(path));
+		}
+
+		public static Assembly GetBranchNameFnAssembly(this string path, string pattern)
+		{
+			var assemblyPath = Path.Combine(path, $"{pattern.ToMD5()}.bnfa");
+
+			if (File.Exists(assemblyPath))
+				return Assembly.Load(File.ReadAllBytes(assemblyPath));
+
+			return assemblyPath.GenerateBranchNameFnAssembly(pattern);
+		}
 
 		public static bool GetEnabled(this Repository repo)
 		{
@@ -86,11 +139,11 @@ namespace GitStory.Core
 			=> new Signature(
 				repo.GetCommiterIdentity(), time);
 
-		public static StoryBranchNameDelegate GetStoryBranchNameFn(this string pattern)
+		public static StoryBranchNameDelegate GetStoryBranchNameFn(this string pattern, Repository repo)
 			=> StoryBranchNameFns.GetOrAdd(pattern, p => {
-				var barnchNameScript = CSharpScript.Create<string>($"$\"{p}\""
-					, globalsType: typeof(StoryBranchNameDelegateParameters));
-				barnchNameScript.Compile();
+				var assembly = repo.GetInternalDataPath().GetBranchNameFnAssembly(pattern);
+				var type = assembly.GetType("Submission#0");
+				var factory = type.GetMethod("<Factory>");
 
 				return (id, branch, commit) =>
 				{
@@ -100,7 +153,12 @@ namespace GitStory.Core
 						branch = branch,
 						commit = commit
 					};
-					return barnchNameScript.RunAsync(globals).Result.ReturnValue;
+
+					var submissionArray = new object[2];
+					submissionArray[0] = globals;
+					Task<string> task = (Task<string>)factory.Invoke(null, new object[] { submissionArray });
+
+					return task.Result;
 				};
 			});
 
@@ -108,7 +166,7 @@ namespace GitStory.Core
 			=> repo.Config.GetValueOrDefault("gitstory.branchnamepattern", DefaultStoryBranchNamePattern);
 
 		public static StoryBranchNameDelegate GetStoryBranchNameFn(this Repository repo)
-			=> repo.GetStoryBranchNamePattern().GetStoryBranchNameFn();
+			=> repo.GetStoryBranchNamePattern().GetStoryBranchNameFn(repo);
 
 		public static Branch GetStoryBranch(this Repository repo
 			, Branch branch, StoryBranchNameDelegate storyBranchNameFn)
@@ -137,7 +195,7 @@ namespace GitStory.Core
 
 		public static Repository RenameStoryBranches(this Repository repo
 			, string oldPattern, string newPattern = null)
-			=> repo.RenameStoryBranches(oldPattern.GetStoryBranchNameFn(), newPattern.GetStoryBranchNameFn());
+			=> repo.RenameStoryBranches(oldPattern.GetStoryBranchNameFn(repo), newPattern.GetStoryBranchNameFn(repo));
 
 		public static Repository RenameStoryBranches(this Repository repo
 			, StoryBranchNameDelegate oldBranchNameFn

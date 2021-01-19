@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using SystemEx;
 
 namespace GitStory.Core
 {
@@ -30,7 +30,10 @@ namespace GitStory.Core
 
 			foreach (var item in repo.RetrieveStatus(new StatusOptions { IncludeIgnored = false }))
 			{
-				filesStatus.Add(item.FilePath, item.State);
+				if (!filesStatus.ContainsKey(item.FilePath))
+					filesStatus.Add(item.FilePath, item.State);
+				else
+					filesStatus[item.FilePath] = filesStatus[item.FilePath] | item.State;
 			}
 		}
 

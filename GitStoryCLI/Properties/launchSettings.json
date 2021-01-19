@@ -2,8 +2,7 @@
   "profiles": {
     "GitStoryCLI": {
       "commandName": "Project",
-      "commandLineArgs": "status",
-      "workingDirectory": "D:\\workspace\\Planar"
+      "workingDirectory": "D:\\workspace\\Galaxy"
     }
   }
 }
