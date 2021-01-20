@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.IO;
+using VSIXEx;
 using VSIXEx.Events;
 
 namespace GitStoryVSIX
@@ -31,6 +32,8 @@ namespace GitStoryVSIX
 				rdte = new RunningDocTableEvents(package,
 					OnAfterSaveAll: () =>
 					{
+						ThreadHelper.ThrowIfNotOnUIThread();
+
 						if (repo?.GetEnabled() ?? false)
 						{
 							print("Saving Story...");
@@ -38,7 +41,12 @@ namespace GitStoryVSIX
 							{
 								repo?.Store();
 							}
-							catch { }
+							catch (Exception e)
+							{
+								var errorPane = dte.ToolWindows.OutputWindow.OutputWindowPanes.PaneByName("VSIX: Errors");
+
+								errorPane.OutputString(e.ToString());
+							}
 						}
 					});
 			}

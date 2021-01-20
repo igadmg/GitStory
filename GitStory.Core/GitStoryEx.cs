@@ -72,6 +72,28 @@ namespace GitStory.Core
 			return assemblyPath.GenerateBranchNameFnAssembly(pattern);
 		}
 
+		public static MethodInfo GetBranchNameFnMethod(this string path, string pattern)
+		{
+			var assembly = path.GetBranchNameFnAssembly(pattern);
+			var type = assembly.GetType("Submission#0");
+			if (type == null)
+			{
+				path.RemoveBranchNameFnAssembly(pattern);
+				assembly = path.GetBranchNameFnAssembly(pattern);
+				type = assembly.GetType("Submission#0");
+			}
+
+			return type.GetMethod("<Factory>");
+		}
+
+		public static void RemoveBranchNameFnAssembly(this string path, string pattern)
+		{
+			var assemblyPath = Path.Combine(path, $"{pattern.ToMD5()}.bnfa");
+
+			if (File.Exists(assemblyPath))
+				File.Delete(assemblyPath);
+		}
+
 		public static bool GetEnabled(this Repository repo)
 		{
 			return repo.Config.Get<bool>("gitstory.enabled")?.Value ?? false;
@@ -141,9 +163,7 @@ namespace GitStory.Core
 
 		public static StoryBranchNameDelegate GetStoryBranchNameFn(this string pattern, Repository repo)
 			=> StoryBranchNameFns.GetOrAdd(pattern, p => {
-				var assembly = repo.GetInternalDataPath().GetBranchNameFnAssembly(pattern);
-				var type = assembly.GetType("Submission#0");
-				var factory = type.GetMethod("<Factory>");
+				var method = repo.GetInternalDataPath().GetBranchNameFnMethod(pattern);
 
 				return (id, branch, commit) =>
 				{
@@ -156,9 +176,18 @@ namespace GitStory.Core
 
 					var submissionArray = new object[2];
 					submissionArray[0] = globals;
-					Task<string> task = (Task<string>)factory.Invoke(null, new object[] { submissionArray });
 
-					return task.Result;
+					try
+					{
+						return ((Task<string>)method.Invoke(null, new object[] { submissionArray })).Result;
+					}
+					catch (TargetInvocationException e)
+					{
+						repo.GetInternalDataPath().RemoveBranchNameFnAssembly(pattern);
+						method = repo.GetInternalDataPath().GetBranchNameFnMethod(pattern);
+					}
+
+					return ((Task<string>)method.Invoke(null, new object[] { submissionArray })).Result;
 				};
 			});
 
@@ -256,7 +285,7 @@ namespace GitStory.Core
 			if (!repo.GetEnabled())
 				return repo;
 
-			using (var aes = new AggregateExceptionScope())
+			using (var aes = new AggregateExceptionScope()) 
 			using (var st = new CaptureStatus(repo))
 			{
 				if (st.IsEmpty)
