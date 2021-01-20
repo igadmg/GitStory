@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Shell;
+﻿using LibGit2Sharp;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -30,15 +31,20 @@ namespace GitStoryVSIX
 	[ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
 	[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
 	[Guid(GitStoryVSPackage.PackageGuidString)]
-	[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
+	[ProvideOptionPage(typeof(OptionPageGrid), "GitStory", "General", 0, 0, true)]
+	//[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
 	public sealed class GitStoryVSPackage : AsyncPackage
 	{
+		public static GitStoryVSPackage instance;
+
 		/// <summary>
 		/// GitsVSPackage GUID string.
 		/// </summary>
 		public const string PackageGuidString = "1ca85a6f-8929-4d41-adcf-8bbafbbb6740";
 		private SolutionWatcher sw;
 		private VsSolutionEvents solutionEvents;
+
+		public Repository Repo => sw?.Repo;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="GitStoryVSPackage"/> class.
@@ -49,6 +55,8 @@ namespace GitStoryVSIX
 			// any Visual Studio service because at this point the package object is created but
 			// not sited yet inside Visual Studio environment. The place to do all the other
 			// initialization is the Initialize method.
+
+			instance = this;
 		}
 
 		#region Package Members

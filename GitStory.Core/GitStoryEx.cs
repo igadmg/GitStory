@@ -181,7 +181,7 @@ namespace GitStory.Core
 					{
 						return ((Task<string>)method.Invoke(null, new object[] { submissionArray })).Result;
 					}
-					catch (TargetInvocationException e)
+					catch (Exception e)
 					{
 						repo.GetInternalDataPath().RemoveBranchNameFnAssembly(pattern);
 						method = repo.GetInternalDataPath().GetBranchNameFnMethod(pattern);
@@ -308,7 +308,12 @@ namespace GitStory.Core
 						var now = DateTime.Now;
 						var author = repo.GetAuthorSignature(now);
 						var commiter = repo.GetCommiterSignature(now);
-						repo.Commit(message, author, commiter);
+
+						try
+						{
+							repo.Commit(message, author, commiter);
+						}
+						catch (EmptyCommitException e) { }
 					});
 				}
 			}

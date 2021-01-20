@@ -18,6 +18,8 @@ namespace GitStoryVSIX
 		private Repository repo;
 
 
+		public Repository Repo => repo;
+
 		public SolutionWatcher(AsyncPackage package)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
