@@ -19,7 +19,7 @@ namespace GitStory.Core
 	{
 		static Dictionary<string, StoryBranchNameDelegate> StoryBranchNameFns = new Dictionary<string, StoryBranchNameDelegate>();
 
-		public static string DefaultStoryBranchNamePattern = "story/{id}/{branch.FriendlyName}/{commit.Sha}";
+		public static string DefaultStoryBranchNamePattern = "story/{id}/{branch?.FriendlyName}/{commit?.Sha}";
 		public static string DefaultCommitMessage = "update";
 
 		public static string ToMD5(this string str, string format = "x2")
