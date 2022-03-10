@@ -10,6 +10,3 @@
 [submodule "VSIXEx.Designer"]
 	path = VSIXEx.Designer
 	url = git@github.com:yatagarasu25/VSIXEx.Designer.git
-[submodule "libgit2sharp.nativebinaries"]
-	path = libgit2sharp.nativebinaries
-	url = git@github.com:yatagarasu25/libgit2sharp.nativebinaries.git

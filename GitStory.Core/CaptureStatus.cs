@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SystemEx;
 
 namespace GitStory.Core
 {

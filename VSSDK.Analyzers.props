@@ -1,8 +1,0 @@
-<Project>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.0.0" PrivateAssets="none" />
-    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="2.9.4" PrivateAssets="none" />
-    <PackageReference Include="Microsoft.VisualStudio.SDK.Analyzers" Version="16.5.5" PrivateAssets="none" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.3.52" PrivateAssets="none" />
-  </ItemGroup>
-</Project>

@@ -133,7 +133,7 @@ namespace GitStory.Core
 
 		public static Repository ChangeUuid(this Repository repo, string oldUuid, string newUuid)
 		{
-			if (newUuid.null_ws_())
+			if (newUuid.IsNullOrWhiteSpace())
 				newUuid = repo.GenerateUuid();
 
 			foreach (var b in repo.Branches)
