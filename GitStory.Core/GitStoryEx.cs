@@ -114,7 +114,7 @@ namespace GitStory.Core
 			return repo;
 		}
 
-		public static StoryRepositoryMode GetRepository(this Repository repo)
+		public static StoryRepositoryMode GetRepositoryMode(this Repository repo)
 		{
 			string v = repo.Config.Get<string>("gitstory.repository")?.Value
 				?? repo.Config.Get<string>("gitstory.repository",  ConfigurationLevel.Global)?.Value
@@ -122,12 +122,38 @@ namespace GitStory.Core
 			return Enum.TryParse<StoryRepositoryMode>(v, true, out var e) ? e : StoryRepositoryMode.Embedded;
 		}
 
-		public static Repository SetRepository(this Repository repo, StoryRepositoryMode mode, ConfigurationLevel level = ConfigurationLevel.Local)
+		public static Repository SetRepositoryMode(this Repository repo, StoryRepositoryMode mode, ConfigurationLevel level = ConfigurationLevel.Local)
 		{
 			repo.Config.Set("gitstory.repository", mode.ToString(), level);
 
 			return repo;
 		}
+
+		public static DisposableLock<Repository> SwitchRepositoryMode(this Repository repo)
+			=> repo.SwitchRepositoryMode(repo.GetRepositoryMode());
+
+		public static DisposableLock<Repository> SwitchRepositoryMode(this Repository repo, StoryRepositoryMode mode)
+			=> mode switch {
+				StoryRepositoryMode.Separate => DisposableLock.Lock(
+					() => {
+						Directory.Move(repo.Info.Path, Path.Combine(repo.Info.WorkingDirectory, ".git.original"));
+						if (Directory.Exists(Path.Combine(repo.Info.WorkingDirectory, ".git.story")))
+						{
+							Directory.Move(Path.Combine(repo.Info.WorkingDirectory, ".git.story"), repo.Info.Path);
+						}
+						else
+						{
+							DirectoryEx.Copy(Path.Combine(repo.Info.WorkingDirectory, ".git.original"), repo.Info.Path);
+						}
+
+						return new Repository(repo.Info.WorkingDirectory);
+					}, r => {
+						Directory.Move(repo.Info.Path, Path.Combine(repo.Info.WorkingDirectory, ".git.story"));
+						Directory.Move(Path.Combine(repo.Info.WorkingDirectory, ".git.original"), repo.Info.Path);
+					}),
+				StoryRepositoryMode.Embedded or _ => DisposableLock.Lock(repo, r => { })
+			};
+
 
 		public static string GenerateUuid(this Repository repo)
 		{
@@ -245,6 +271,15 @@ namespace GitStory.Core
 			return repo.Branches.Where(b => b.FriendlyName == n).FirstOrDefault();
 		}
 
+		public static IDisposable SwitchToStoryBranch(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
+			=> repo.SwitchToStoryBranch(repo.GetRepositoryMode(), storyBranchNameFn);
+
+		public static IDisposable SwitchToStoryBranch(this Repository repo, StoryRepositoryMode mode, StoryBranchNameDelegate storyBranchNameFn)
+			=> mode switch {
+				StoryRepositoryMode.Separate => DisposableLock.empty.Also(_ => SwitchBranch.ToStoryBranch(repo, storyBranchNameFn, out var r)),
+				StoryRepositoryMode.Embedded or _ => new SwitchBranch(repo, storyBranchNameFn)
+			};
+
 		public static Repository RenameStoryBranches(this Repository repo
 			, string oldPattern, string newPattern = null)
 			=> repo.RenameStoryBranches(oldPattern.GetStoryBranchNameFn(repo), newPattern.GetStoryBranchNameFn(repo));
@@ -308,23 +343,29 @@ namespace GitStory.Core
 			if (!repo.GetEnabled())
 				return repo;
 
+			using (var r = repo.SwitchRepositoryMode())
 			using (var aes = new AggregateExceptionScope()) 
-			using (var st = new CaptureStatus(repo))
+			using (var st = new CaptureStatus(r._))
 			{
 				if (st.IsEmpty)
 					return repo;
 
 				aes.Execute(() => {
-					repo.Submodules
+					r._.Submodules
 						.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
 						.Execute(sm =>
 						{
-							new Repository(Path.Combine(repo.Info.WorkingDirectory, sm.Path)).Store(storyBranchNameFn, message);
+							new Repository(Path.Combine(r._.Info.WorkingDirectory, sm.Path)).Store(storyBranchNameFn, message);
 						});
 				});
 
-				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
+				using (r._.SwitchToStoryBranch(storyBranchNameFn))
 				{
+					r._.Ignore.AddTemporaryRules(new []{
+						".git.original",
+						".git.story",
+					});
+
 					Commands.Stage(repo, "*");
 
 					aes.Execute(() => {
@@ -350,7 +391,7 @@ namespace GitStory.Core
 		public static Repository Status(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 		{
 			Console.WriteLine($"Git story is {(repo.GetEnabled() ? "enabled" : "disabled")}.");
-			Console.WriteLine($"Git story is in {repo.GetRepository()} mode.");
+			Console.WriteLine($"Git story is in {repo.GetRepositoryMode()} mode.");
 
 			if (!repo.GetEnabled())
 				return repo;
@@ -370,7 +411,7 @@ namespace GitStory.Core
 						});
 				});
 
-				using (new SwitchToStoryBranch(repo, storyBranchNameFn))
+				using (new SwitchBranch(repo, storyBranchNameFn))
 				{
 					Commands.Stage(repo, "*");
 

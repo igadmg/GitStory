@@ -1,9 +1,5 @@
 {
   "profiles": {
-    "GitStoryCLI": {
-      "commandName": "Project",
-      "workingDirectory": "E:\\workspace\\Games\\WheatGame"
-    },
     "git story status": {
       "commandName": "Project",
       "commandLineArgs": "status",
@@ -17,6 +13,10 @@
     "git story set-mode separate --global": {
       "commandName": "Project",
       "commandLineArgs": "set-mode separate --global",
+      "workingDirectory": "E:\\workspace\\Games\\WheatGame"
+    },
+    "git story": {
+      "commandName": "Project",
       "workingDirectory": "E:\\workspace\\Games\\WheatGame"
     }
   }

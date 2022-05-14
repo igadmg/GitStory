@@ -41,7 +41,7 @@ namespace GitStoryCLI
 		public async Task SetRepositoryMode([Option(0)]string mode, bool global = false)
 		{
 			if (Enum.TryParse<StoryRepositoryMode>(mode, true, out var v))
-				repo.SetRepository(v, global ? ConfigurationLevel.Global : ConfigurationLevel.Local);
+				repo.SetRepositoryMode(v, global ? ConfigurationLevel.Global : ConfigurationLevel.Local);
 			else
 				Console.WriteLine($"{mode} is unsopported. Try {Enum.GetValues<StoryRepositoryMode>().Select(e => e.ToString()).Join(", ")}");
 		}
@@ -96,9 +96,6 @@ namespace GitStoryCLI
 		{
 			try
 			{
-				if (!repo.GetEnabled())
-					return;
-
 				repo.Store();
 			}
 			catch { }
