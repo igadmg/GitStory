@@ -2,7 +2,22 @@
   "profiles": {
     "GitStoryCLI": {
       "commandName": "Project",
-      "workingDirectory": "D:\\workspace\\CelluralAutomata"
+      "workingDirectory": "E:\\workspace\\Games\\WheatGame"
+    },
+    "git story status": {
+      "commandName": "Project",
+      "commandLineArgs": "status",
+      "workingDirectory": "E:\\workspace\\Games\\WheatGame"
+    },
+    "git story set-mode separate": {
+      "commandName": "Project",
+      "commandLineArgs": "set-mode separate",
+      "workingDirectory": "E:\\workspace\\Games\\WheatGame"
+    },
+    "git story set-mode separate --global": {
+      "commandName": "Project",
+      "commandLineArgs": "set-mode separate --global",
+      "workingDirectory": "E:\\workspace\\Games\\WheatGame"
     }
   }
 }

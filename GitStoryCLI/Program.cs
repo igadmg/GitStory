@@ -4,12 +4,14 @@ using LibGit2Sharp;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using SystemEx;
 
 namespace GitStoryCLI
 {
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-	class Program : ConsoleAppBase
+	public class Program : ConsoleAppBase
 	{
 		static string dir;
 		static Repository repo;
@@ -24,15 +26,24 @@ namespace GitStoryCLI
 		}
 
 		[Command("enable")]
-		public async Task Enable()
+		public async Task Enable(bool global = false)
 		{
-			repo.SetEnabled(true);
+			repo.SetEnabled(true, global ? ConfigurationLevel.Global : ConfigurationLevel.Local);
 		}
 
 		[Command("disable")]
-		public async Task Disable()
+		public async Task Disable(bool global = false)
 		{
-			repo.SetEnabled(true);
+			repo.SetEnabled(true, global ? ConfigurationLevel.Global : ConfigurationLevel.Local);
+		}
+
+		[Command("set-mode")]
+		public async Task SetRepositoryMode([Option(0)]string mode, bool global = false)
+		{
+			if (Enum.TryParse<StoryRepositoryMode>(mode, true, out var v))
+				repo.SetRepository(v, global ? ConfigurationLevel.Global : ConfigurationLevel.Local);
+			else
+				Console.WriteLine($"{mode} is unsopported. Try {Enum.GetValues<StoryRepositoryMode>().Select(e => e.ToString()).Join(", ")}");
 		}
 
 		[Command("fix")]
@@ -85,6 +96,9 @@ namespace GitStoryCLI
 		{
 			try
 			{
+				if (!repo.GetEnabled())
+					return;
+
 				repo.Store();
 			}
 			catch { }

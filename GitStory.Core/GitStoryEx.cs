@@ -15,6 +15,12 @@ namespace GitStory.Core
 	public class StoryBranchNameDelegateParameters { public string id; public Branch branch; public Commit commit; }
 	public delegate string StoryBranchNameDelegate(string id, Branch branch, Commit commit);
 	
+	public enum StoryRepositoryMode
+	{
+		Embedded,
+		Separate,
+	}
+
 	public static class GitStoryEx
 	{
 		static Dictionary<string, StoryBranchNameDelegate> StoryBranchNameFns = new Dictionary<string, StoryBranchNameDelegate>();
@@ -96,12 +102,29 @@ namespace GitStory.Core
 
 		public static bool GetEnabled(this Repository repo)
 		{
-			return repo.Config.Get<bool>("gitstory.enabled")?.Value ?? false;
+			return repo.Config.Get<bool>("gitstory.enabled")?.Value
+				?? repo.Config.Get<bool>("gitstory.enabled", ConfigurationLevel.Global)?.Value
+				?? false;
 		}
 
-		public static Repository SetEnabled(this Repository repo, bool enabled)
+		public static Repository SetEnabled(this Repository repo, bool enabled, ConfigurationLevel level = ConfigurationLevel.Local)
 		{
-			repo.Config.Set("gitstory.enabled", enabled);
+			repo.Config.Set("gitstory.enabled", enabled, level);
+
+			return repo;
+		}
+
+		public static StoryRepositoryMode GetRepository(this Repository repo)
+		{
+			string v = repo.Config.Get<string>("gitstory.repository")?.Value
+				?? repo.Config.Get<string>("gitstory.repository",  ConfigurationLevel.Global)?.Value
+				?? string.Empty;
+			return Enum.TryParse<StoryRepositoryMode>(v, true, out var e) ? e : StoryRepositoryMode.Embedded;
+		}
+
+		public static Repository SetRepository(this Repository repo, StoryRepositoryMode mode, ConfigurationLevel level = ConfigurationLevel.Local)
+		{
+			repo.Config.Set("gitstory.repository", mode.ToString(), level);
 
 			return repo;
 		}
@@ -326,6 +349,12 @@ namespace GitStory.Core
 
 		public static Repository Status(this Repository repo, StoryBranchNameDelegate storyBranchNameFn)
 		{
+			Console.WriteLine($"Git story is {(repo.GetEnabled() ? "enabled" : "disabled")}.");
+			Console.WriteLine($"Git story is in {repo.GetRepository()} mode.");
+
+			if (!repo.GetEnabled())
+				return repo;
+
 			using (var aes = new AggregateExceptionScope())
 			using (var st = new CaptureStatus(repo))
 			{
