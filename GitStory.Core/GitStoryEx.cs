@@ -100,11 +100,11 @@ namespace GitStory.Core
 				File.Delete(assemblyPath);
 		}
 
-		public static bool GetEnabled(this Repository repo)
+		public static bool GetEnabled(this Repository repo, bool enabled = false)
 		{
 			return repo.Config.Get<bool>("gitstory.enabled")?.Value
 				?? repo.Config.Get<bool>("gitstory.enabled", ConfigurationLevel.Global)?.Value
-				?? false;
+				?? enabled;
 		}
 
 		public static Repository SetEnabled(this Repository repo, bool enabled, ConfigurationLevel level = ConfigurationLevel.Local)
@@ -333,14 +333,15 @@ namespace GitStory.Core
 			return repo;
 		}
 
-		public static Repository Store(this Repository repo)
+		public static Repository Store(this Repository repo, bool enabled = false)
 			=> repo.Store(
 				storyBranchNameFn: repo.GetStoryBranchNameFn(),
-				message: DefaultCommitMessage);
+				message: DefaultCommitMessage,
+				enabled);
 
-		public static Repository Store(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, string message)
+		public static Repository Store(this Repository repo, StoryBranchNameDelegate storyBranchNameFn, string message, bool enabled = false)
 		{
-			if (!repo.GetEnabled())
+			if (!repo.GetEnabled(enabled))
 				return repo;
 
 			using (var r = repo.SwitchRepositoryMode())
@@ -355,7 +356,8 @@ namespace GitStory.Core
 						.Where(sm => sm.RetrieveStatus() != SubmoduleStatus.Unmodified)
 						.Execute(sm =>
 						{
-							new Repository(Path.Combine(r._.Info.WorkingDirectory, sm.Path)).Store(storyBranchNameFn, message);
+							new Repository(Path.Combine(r._.Info.WorkingDirectory, sm.Path))
+								.Also(r => r.Store(r.GetStoryBranchNameFn(), message, enabled));
 						});
 				});
 

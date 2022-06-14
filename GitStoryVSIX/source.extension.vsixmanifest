@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="GitStoryVSIX.95eab47a-61d6-4d3e-b786-fa2be3e899b9" Version="1.3.0" Language="en-US" Publisher="Igor Karatayev" />
-        <DisplayName>GitStoryVSIX</DisplayName>
-        <Description xml:space="preserve">Git Story - track all your changes in a nice way.</Description>
+        <Identity Id="GitStoryVSIX.95eab47a-61d6-4d3e-b786-fa2be3e899b9" Version="1.4.0" Language="en-US" Publisher="Igor Karatayev" />
+        <DisplayName>Git Story</DisplayName>
+        <Description xml:space="preserve">Git Story - track all your changes in a separate branch way.</Description>
         <MoreInfo>https://github.com/yatagarasu25/GitStory</MoreInfo>
         <License>LICENSE</License>
         <Icon>Resources\GitStoryVSPackage.ico</Icon>

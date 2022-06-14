@@ -96,7 +96,7 @@ namespace GitStoryCLI
 		{
 			try
 			{
-				repo.Store();
+				repo.Store(repo.GetEnabled());
 			}
 			catch { }
 		}

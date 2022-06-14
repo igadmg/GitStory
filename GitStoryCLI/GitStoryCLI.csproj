@@ -5,11 +5,29 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net50;net60</TargetFrameworks>
+    <Version>1.4.0</Version>
+    <AssemblyName>git-story</AssemblyName>
+
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>$(AssemblyName)</ToolCommandName>
+
+    <PackageId>$(AssemblyName)</PackageId>
+    <PackageVersion>$(Version)</PackageVersion>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+
+    <Authors>Igor Karatayev</Authors>
+    <Description>Command line tools for Unreal Engine</Description>
+    <Copyright>Igor Karatayev</Copyright>
+    <PackageTags>git; story;</PackageTags>
+    <PackageProjectUrl>https://github.com/yatagarasu25/GitStory</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/yatagarasu25/GitStory</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ConsoleAppFramework" Version="4.0.6" />
-    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.315-alpha.0.9" />
+    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.315" />
   </ItemGroup>
 
   <ItemGroup>

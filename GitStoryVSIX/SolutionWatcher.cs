@@ -41,7 +41,7 @@ namespace GitStoryVSIX
 							print("Saving Story...");
 							try
 							{
-								repo?.Store();
+								repo?.Store(repo.GetEnabled());
 							}
 							catch (Exception e)
 							{

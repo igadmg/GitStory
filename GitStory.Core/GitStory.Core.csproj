@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net472;net50;net60</TargetFrameworks>
+    <Version>1.4.0</Version>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
     <LangVersion>latest</LangVersion>
